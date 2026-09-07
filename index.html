@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Mạnh Toản &amp; Thanh Kim | Wedding Invitation</title>
+<meta name="description" content="Thiệp mời cưới Mạnh Toản & Thanh Kim" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💍</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+<!-- ============ ENVELOPE INTRO ============ -->
+<div id="envelope-screen">
+  <div class="envelope">
+    <div class="envelope-flap"></div>
+    <div class="envelope-body">
+      <div class="envelope-seal">💌</div>
+    </div>
+    <div class="envelope-card">
+      <p class="envelope-label">Trân trọng kính mời</p>
+      <p class="envelope-guest" id="guestNameEnvelope">Quý khách</p>
+    </div>
+  </div>
+  <button id="openInviteBtn" class="btn-open">Mở thiệp mời <span class="arrow">→</span></button>
+</div>
+
+<!-- ============ MUSIC TOGGLE ============ -->
+<button id="musicToggle" class="music-toggle" aria-label="Bật/tắt nhạc nền">
+  <span class="disc">🎵</span>
+</button>
+<audio id="bgMusic" loop preload="none">
+  <source src="assets/audio/bg-music.mp3" type="audio/mpeg" />
+</audio>
+
+<!-- ============ NAV DOTS ============ -->
+<nav class="dot-nav" aria-label="Điều hướng nhanh">
+  <a href="#hero" data-label="Trang chủ"></a>
+  <a href="#family" data-label="Hai gia đình"></a>
+  <a href="#events" data-label="Sự kiện"></a>
+  <a href="#gallery" data-label="Album"></a>
+  <a href="#guestbook" data-label="Lưu bút"></a>
+  <a href="#rsvp" data-label="Xác nhận"></a>
+  <a href="#gift" data-label="Mừng cưới"></a>
+  <a href="#countdown" data-label="Đếm ngược"></a>
+</nav>
+
+<main id="page">
+
+  <!-- ============ HERO ============ -->
+  <section id="hero" class="section hero">
+    <div class="hero-bg" data-parallax></div>
+    <div class="hero-content reveal">
+      <p class="hero-eyebrow">Quyết định bên nhau trọn đời</p>
+      <h1 class="couple-names">Mạnh Toản <span class="amp">&amp;</span> Thanh Kim</h1>
+      <p class="hero-date" id="heroDateLine">Save the date · 25 . 10 . 2026</p>
+      <p class="hero-date-lunar" id="heroLunarDate">Nhằm ngày ... tháng ... năm ... (Âm lịch)</p>
+      <p class="guest-line">Thân mời <strong id="guestNameHero">Quý khách</strong> đến chung vui cùng chúng tôi</p>
+      <a href="#family" class="scroll-hint" aria-label="Cuộn xuống">
+        <span></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ FAMILY ============ -->
+  <section id="family" class="section family">
+    <p class="eyebrow center reveal">Trân trọng kính báo</p>
+    <p class="section-script center reveal">Hai gia đình</p>
+    <div class="family-grid">
+      <div class="family-card reveal">
+        <div class="family-photo">
+          <div class="family-photo-inner"><span>Nhà Trai</span></div>
+        </div>
+        <p class="family-side">Nhà Trai</p>
+        <h3>Chú Rể — Mạnh Toản</h3>
+        <p class="family-parents">
+          Ông <strong>Đinh Văn Toan</strong><br/>
+          Bà <strong>Đỗ Thị Hà</strong>
+        </p>
+        <p class="family-address">TP. Hồ Chí Minh</p>
+      </div>
+      <div class="family-divider" aria-hidden="true">
+        <span>&amp;</span>
+      </div>
+      <div class="family-card reveal">
+        <div class="family-photo">
+          <div class="family-photo-inner"><span>Nhà Gái</span></div>
+        </div>
+        <p class="family-side">Nhà Gái</p>
+        <h3>Cô Dâu — Thanh Kim</h3>
+        <p class="family-parents">
+          Ông <strong>Lê Văn Hồng</strong><br/>
+          Bà <strong>Trần Thị Tuyết Mai</strong>
+        </p>
+        <p class="family-address">TP. Hồ Chí Minh</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EVENTS ============ -->
+  <section id="events" class="section events">
+    <p class="eyebrow center reveal">Thông tin sự kiện</p>
+    <h2 class="section-title center reveal">Trân trọng kính mời</h2>
+    <p class="events-lunar reveal" id="eventsLunarDate">Ngày ... tháng ... năm ... (Âm lịch)</p>
+    <div class="events-grid">
+      <div class="event-card reveal">
+        <div class="event-icon">🥂</div>
+        <h3>Tiệc Chung Vui</h3>
+        <p class="event-time" id="eventTiecTime">11:00<br/>Chủ nhật, 25/10/2026</p>
+        <p class="event-place" id="eventTiecPlace">Trung tâm Hội nghị Riverside<br/>Số 88, đường Nguyễn Huệ, Q.1, TP.HCM</p>
+        <a class="btn-outline sm" id="eventTiecMapLink" href="https://maps.google.com/?q=Ho+Chi+Minh+City" target="_blank" rel="noopener">Chỉ đường</a>
+      </div>
+      <div class="event-card reveal">
+        <div class="event-icon">🌿</div>
+        <h3 id="eventLeLabel">Lễ Vu Quy</h3>
+        <p class="event-time" id="eventLeTime">8:00<br/>Chủ nhật, 25/10/2026</p>
+        <p class="event-place" id="eventLePlace">Tư gia nhà gái<br/>Số 12, đường Hoa Mai, Q. Bình Thạnh, TP.HCM</p>
+        <a class="btn-outline sm" id="eventLeMapLink" href="https://maps.google.com/?q=Ho+Chi+Minh+City" target="_blank" rel="noopener">Chỉ đường</a>
+      </div>
+    </div>
+    <div class="map-embed reveal">
+      <iframe
+        title="Bản đồ địa điểm tổ chức"
+        src="https://maps.google.com/maps?q=Ho%20Chi%20Minh%20City&t=&z=13&ie=UTF8&iwloc=&output=embed"
+        loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+    <p class="dresscode reveal">👗 Dress code gợi ý: tông <strong>be — nâu đất</strong>. Mong bạn tránh mặc màu trắng/màu đỏ đậm để nhường sắc cho cô dâu chú rể nhé!</p>
+  </section>
+
+  <!-- ============ GALLERY ============ -->
+  <section id="gallery" class="section gallery">
+    <p class="eyebrow center reveal">Album ảnh cưới</p>
+    <h2 class="section-title center reveal">Khoảnh khắc của chúng tôi</h2>
+    <div class="gallery-grid">
+      <div class="gallery-item reveal g1" data-img="1"><span>Ảnh 1</span></div>
+      <div class="gallery-item reveal g2" data-img="2"><span>Ảnh 2</span></div>
+      <div class="gallery-item reveal g3" data-img="3"><span>Ảnh 3</span></div>
+      <div class="gallery-item reveal g4" data-img="4"><span>Ảnh 4</span></div>
+      <div class="gallery-item reveal g5" data-img="5"><span>Ảnh 5</span></div>
+      <div class="gallery-item reveal g6" data-img="6"><span>Ảnh 6</span></div>
+    </div>
+    <p class="gallery-note reveal">*Thay các ô này bằng ảnh cưới thật của bạn trong thư mục <code>assets/img/</code></p>
+  </section>
+
+  <!-- ============ WAVE: ivory → navy ============ -->
+  <div class="wave-divider" aria-hidden="true">
+    <svg viewBox="0 0 1440 74" preserveAspectRatio="none"><path d="M0,37 C180,10 360,64 540,45 C720,26 900,64 1080,45 C1260,26 1350,10 1440,37 L1440,74 L0,74 Z" style="fill:var(--color-navy)"></path></svg>
+  </div>
+
+  <!-- ============ GUESTBOOK / SỔ LƯU BÚT (nền navy) ============ -->
+  <section id="guestbook" class="section on-navy guestbook">
+    <p class="eyebrow center on-navy reveal">Sổ lưu bút</p>
+    <p class="section-script center on-navy reveal">Gửi Lời Chúc</p>
+    <p class="guestbook-sub reveal">Để lại vài dòng lưu niệm cho cô dâu chú rể — lời chúc của bạn sẽ xuất hiện ngay bên dưới.</p>
+    <form id="guestbookForm" class="guestbook-form reveal">
+      <input type="text" id="gbName" placeholder="Tên của bạn" required />
+      <textarea id="gbMessage" rows="2" placeholder="Lời chúc..." required></textarea>
+      <button type="submit" class="btn-outline on-navy sm">Gửi lời chúc</button>
+    </form>
+    <div id="guestbookWall" class="guestbook-wall"></div>
+    <p class="guestbook-note reveal">*Bản demo: lời chúc chỉ hiển thị tạm trên máy bạn (mất khi tải lại trang). Xem README để nối vào Google Sheet, hiển thị lời chúc thật của mọi khách mời cho tất cả cùng xem.</p>
+  </section>
+
+  <!-- ============ RSVP (tiếp tục nền navy) ============ -->
+  <section id="rsvp" class="section on-navy rsvp">
+    <p class="eyebrow center on-navy reveal">Xác nhận tham dự</p>
+    <p class="section-script center on-navy reveal">Bạn sẽ đến chứ?</p>
+    <p class="rsvp-sub reveal">Vui lòng phản hồi trước ngày 15/10/2026 để chúng tôi chuẩn bị chu đáo nhất.</p>
+    <form id="rsvpForm" class="rsvp-form reveal">
+      <div class="form-row">
+        <label for="rsvpName">Họ và tên</label>
+        <input type="text" id="rsvpName" name="name" required placeholder="Nguyễn Văn A" />
+      </div>
+      <div class="form-row">
+        <label for="rsvpPhone">Số điện thoại</label>
+        <input type="tel" id="rsvpPhone" name="phone" placeholder="09xx xxx xxx" />
+      </div>
+      <div class="form-row">
+        <label>Bạn là khách mời của</label>
+        <div class="side-toggle">
+          <button type="button" class="side-btn active" data-side="groom">
+            <span class="side-avatar">CR</span> Chú Rể
+          </button>
+          <button type="button" class="side-btn" data-side="bride">
+            <span class="side-avatar">CD</span> Cô Dâu
+          </button>
+        </div>
+        <input type="hidden" name="side" id="rsvpSide" value="groom" />
+      </div>
+      <div class="form-row">
+        <label>Bạn sẽ tham dự?</label>
+        <div class="radio-group">
+          <label class="radio"><input type="radio" name="attend" value="yes" checked /> Có, chắc chắn rồi!</label>
+          <label class="radio"><input type="radio" name="attend" value="maybe" /> Có thể</label>
+          <label class="radio"><input type="radio" name="attend" value="no" /> Xin phép vắng mặt</label>
+        </div>
+      </div>
+      <div class="form-row">
+        <label for="rsvpGuests">Số người đi cùng</label>
+        <input type="number" id="rsvpGuests" name="guests" min="0" max="10" value="0" />
+      </div>
+      <div class="form-row">
+        <label for="rsvpMsg">Lời chúc</label>
+        <textarea id="rsvpMsg" name="message" rows="3" placeholder="Gửi lời chúc mừng tới cô dâu chú rể..."></textarea>
+      </div>
+      <button type="submit" class="btn-solid">Gửi xác nhận</button>
+      <p class="form-note">*Đây là bản demo: form đang gửi qua email mặc định của trình duyệt. Xem README để nối với Google Form / Google Sheet miễn phí.</p>
+    </form>
+    <div id="rsvpThanks" class="rsvp-thanks" hidden>
+      <p>💛 Cảm ơn <strong id="rsvpThanksName">bạn</strong> đã phản hồi! Hẹn gặp trong ngày trọng đại.</p>
+    </div>
+  </section>
+
+  <!-- ============ GIFT (tiếp tục nền navy) ============ -->
+  <section id="gift" class="section on-navy gift">
+    <p class="eyebrow center on-navy reveal">Mừng cưới</p>
+    <p class="section-script center on-navy reveal">Hộp Mừng Cưới</p>
+    <p class="gift-sub reveal">Sự hiện diện của bạn là món quà quý giá nhất. Nếu muốn gửi lời chúc kèm quà mừng, bạn có thể bấm nút bên dưới để hiện mã QR chuyển khoản (quét được bằng app ngân hàng / ví điện tử hỗ trợ VietQR).</p>
+    <div class="gift-cards">
+      <div class="gift-card reveal">
+        <h3>Chú Rể — Mạnh Toản</h3>
+        <p>Ngân hàng Vietcombank</p>
+        <p class="acc">STK: 0123456789</p>
+        <button
+          class="btn-qr"
+          type="button"
+          aria-expanded="false"
+          data-bin="970436"
+          data-account="0123456789"
+          data-name="DINH MANH TOAN"
+          data-purpose="Mung cuoi Dinh Manh Toan"
+        >Xem mã QR chuyển khoản</button>
+        <div class="qr-panel">
+          <div class="qr-box"><img alt="Mã QR chuyển khoản cho Chú Rể" /></div>
+          <div class="qr-actions">
+            <button class="btn-copy btn-download" type="button" data-download data-download-name="qr-chu-re-manh-toan.png">⬇ Tải ảnh QR</button>
+            <button class="btn-copy" type="button" data-copy="0123456789">📋 Copy số tài khoản</button>
+          </div>
+        </div>
+      </div>
+      <div class="gift-card reveal">
+        <h3>Cô Dâu — Thanh Kim</h3>
+        <p>Ngân hàng Techcombank</p>
+        <p class="acc">STK: 9876543210</p>
+        <button
+          class="btn-qr"
+          type="button"
+          aria-expanded="false"
+          data-bin="970407"
+          data-account="9876543210"
+          data-name="LE THI THANH KIM"
+          data-purpose="Mung cuoi Le Thi Thanh Kim"
+        >Xem mã QR chuyển khoản</button>
+        <div class="qr-panel">
+          <div class="qr-box"><img alt="Mã QR chuyển khoản cho Cô Dâu" /></div>
+          <div class="qr-actions">
+            <button class="btn-copy btn-download" type="button" data-download data-download-name="qr-co-dau-thanh-kim.png">⬇ Tải ảnh QR</button>
+            <button class="btn-copy" type="button" data-copy="9876543210">📋 Copy số tài khoản</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WAVE: navy → ivory ============ -->
+  <div class="wave-divider flip" aria-hidden="true">
+    <svg viewBox="0 0 1440 74" preserveAspectRatio="none"><path d="M0,37 C180,10 360,64 540,45 C720,26 900,64 1080,45 C1260,26 1350,10 1440,37 L1440,74 L0,74 Z" style="fill:var(--color-navy)"></path></svg>
+  </div>
+
+  <!-- ============ COUNTDOWN ============ -->
+  <section id="countdown" class="section countdown">
+    <div class="countdown-inner reveal">
+      <p class="section-script center">Countdown</p>
+      <p class="eyebrow center" id="countdownDateLine">Đếm ngược đến ngày cưới · 25 . 10 . 2026</p>
+      <div class="timer" id="timer">
+        <div class="timer-block"><span class="num" id="cd-days">00</span><span class="label">Ngày</span></div>
+        <div class="timer-block"><span class="num" id="cd-hours">00</span><span class="label">Giờ</span></div>
+        <div class="timer-block"><span class="num" id="cd-mins">00</span><span class="label">Phút</span></div>
+        <div class="timer-block"><span class="num" id="cd-secs">00</span><span class="label">Giây</span></div>
+      </div>
+      <a class="btn-outline" id="addCalendarBtn" href="#" target="_blank" rel="noopener">+ Thêm vào Google Calendar</a>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer reveal">
+    <p class="footer-script">Thank You</p>
+    <p class="footer-line">Rất hân hạnh được đón tiếp 💐 — cảm ơn bạn đã dành thời gian ghé thăm thiệp cưới của chúng tôi.</p>
+    <p class="footer-names">Mạnh Toản <span class="amp">&amp;</span> Thanh Kim</p>
+    <div class="footer-social">
+      <a href="#" aria-label="Facebook" title="Thay bằng link Facebook thật">
+        <svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12Z"/></svg>
+      </a>
+      <a href="#" aria-label="Zalo" title="Thay bằng link Zalo thật">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6 2 11c0 2.9 1.5 5.5 3.9 7.2-.1.9-.5 2.3-1.4 3.4 0 0 2.2-.2 4.1-1.6 1 .3 2.2.5 3.4.5 5.5 0 10-4 10-9S17.5 2 12 2Z"/></svg>
+      </a>
+    </div>
+    <p class="footer-made">Made with love — 2027</p>
+  </footer>
+
+</main>
+
+<script src="assets/js/vendor/qrcode.min.js"></script>
+<script src="assets/js/vendor/vn-lunar.min.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

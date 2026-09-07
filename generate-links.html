@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Công cụ tạo link riêng cho khách mời</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --primary:#a8763e; --bg:#fbf6f0; --line:#ddd0bf; --ink:#2e2a26; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Be Vietnam Pro", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+  h1 { font-size: 1.5rem; margin-bottom: 4px; }
+  p.sub { color: #6b6259; margin-top: 0; }
+  .box {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 24px;
+  }
+  label { font-weight: 600; display: block; margin-bottom: 8px; }
+  textarea, input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    font-family: inherit;
+    font-size: 0.95rem;
+  }
+  textarea { min-height: 140px; resize: vertical; }
+  button {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 14px;
+  }
+  button:hover { opacity: 0.9; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.88rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: #6b6259; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  code { background: #f4ece2; padding: 2px 6px; border-radius: 6px; word-break: break-all; }
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    margin: 0;
+  }
+  .note { font-size: 0.8rem; color: #6b6259; }
+</style>
+</head>
+<body>
+  <h1>🔗 Công cụ tạo link riêng cho khách mời</h1>
+  <p class="sub">Dán danh sách tên khách (mỗi tên 1 dòng) để tạo link thiệp cá nhân hoá — không cần server, chạy hoàn toàn trên trình duyệt. Mẹo: thêm dấu <code>+</code> ở cuối tên (vd "Thanh Toàn +") nếu muốn mời kèm người thân, thiệp sẽ tự hiển thị "... và người thân".</p>
+
+  <div class="box">
+    <label for="baseUrl">Địa chỉ website thiệp cưới của bạn (sau khi deploy)</label>
+    <input id="baseUrl" type="text" placeholder="https://ten-cua-ban.vercel.app" value="https://ten-cua-ban.vercel.app" />
+    <br/><br/>
+    <label for="names">Danh sách khách mời (mỗi tên một dòng)</label>
+    <textarea id="names" placeholder="Nguyễn Văn A&#10;Trần Thị B&#10;Gia đình Cô Chú C">Nguyễn Văn A
+Trần Thị B
+Gia đình Cô Chú C</textarea>
+    <br/>
+    <button id="genBtn">Tạo link</button>
+    <p class="note">Mẹo: bạn cũng có thể import danh sách từ file <code>guests.csv</code> đi kèm — mở file đó bằng Excel/Google Sheets, thêm/sửa tên rồi copy cột "Họ tên" dán vào ô trên.</p>
+  </div>
+
+  <div class="box">
+    <label>⏰ Cài đặt ngày giờ &amp; địa điểm (không cần sửa code)</label>
+    <p class="note" style="margin-top:-4px;">Danh sách khách ở ô trên là của <strong>một bên</strong> (nhà trai hoặc nhà gái). Chọn đúng bên, điền giờ Tiệc Chung Vui + giờ buổi lễ của bên đó — vì nhiều khách thường mời cùng giờ, bạn chỉ cần điền 1 lần ở đây rồi bấm "Tạo link" là toàn bộ danh sách phía trên đều có đúng giờ này, không phải nhập lại cho từng khách. Muốn tạo cho bên còn lại: đổi lựa chọn bên dưới, dán danh sách khách của bên đó, điền lại giờ rồi bấm "Tạo link" lần nữa.</p>
+
+    <label for="benSelect" style="margin-top:14px;">Tạo thiệp cho bên nào?</label>
+    <select id="benSelect">
+      <option value="gai">🌿 Nhà Gái — Tiệc Chung Vui + Lễ Vu Quy</option>
+      <option value="trai">🥂 Nhà Trai — Tiệc Chung Vui + Lễ Thành Hôn</option>
+    </select>
+
+    <label for="tiecNgayGio" style="margin-top:20px;">🥂 Tiệc Chung Vui — giờ &amp; ngày</label>
+    <input id="tiecNgayGio" type="datetime-local" value="2026-10-25T11:00" />
+
+    <label for="tiecDiaDiem" style="margin-top:14px;">🥂 Tiệc Chung Vui — địa điểm (Enter để xuống dòng)</label>
+    <textarea id="tiecDiaDiem" style="min-height:70px;" placeholder="VD: Trung tâm Hội nghị Riverside&#10;Số 88, đường Nguyễn Huệ, Q.1, TP.HCM"></textarea>
+
+    <label for="tiecMap" style="margin-top:14px;">🥂 Tiệc Chung Vui — link Google Maps (nút "Chỉ đường")</label>
+    <input id="tiecMap" type="text" placeholder="https://maps.google.com/?q=..." />
+
+    <label for="leNgayGio" style="margin-top:20px;" id="leNgayGioLabel">🌿 Lễ Vu Quy — giờ &amp; ngày</label>
+    <input id="leNgayGio" type="datetime-local" value="2026-10-25T08:00" />
+
+    <label for="leDiaDiem" style="margin-top:14px;" id="leDiaDiemLabel">🌿 Lễ Vu Quy — địa điểm (Enter để xuống dòng)</label>
+    <textarea id="leDiaDiem" style="min-height:70px;" placeholder="VD: Tư gia nhà gái&#10;Số 12, đường Hoa Mai, Q. Bình Thạnh, TP.HCM"></textarea>
+
+    <label for="leMap" style="margin-top:14px;" id="leMapLabel">🌿 Lễ Vu Quy — link Google Maps (nút "Chỉ đường")</label>
+    <input id="leMap" type="text" placeholder="https://maps.google.com/?q=..." />
+
+    <button id="previewBtn" type="button" style="background:transparent; border:1px solid var(--primary); color:var(--primary);">👀 Xem thử thiệp với thông tin này</button>
+  </div>
+
+  <div class="box">
+    <label>Kết quả</label>
+    <table id="resultTable">
+      <thead><tr><th>Khách mời</th><th>Link riêng</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <button id="downloadBtn" style="display:none;">⬇ Tải file CSV kết quả</button>
+  </div>
+
+  <p class="note">Sau khi có link, bạn gửi trực tiếp cho từng khách qua Zalo/Messenger/SMS. Khi họ mở link, thiệp sẽ tự hiển thị đúng tên của họ ở trang bìa và phần mở đầu.</p>
+
+<script>
+  const genBtn = document.getElementById("genBtn");
+  const downloadBtn = document.getElementById("downloadBtn");
+  const tbody = document.querySelector("#resultTable tbody");
+  let lastRows = [];
+
+  const VN_WEEKDAYS = ["Chủ nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+  function formatVNDate(dt) {
+    // dt: chuỗi "YYYY-MM-DDTHH:mm" từ <input type="datetime-local">
+    if (!dt) return "";
+    const [datePart] = dt.split("T");
+    const [y, m, d] = datePart.split("-").map(Number);
+    const jsDate = new Date(y, m - 1, d);
+    const dd = String(d).padStart(2, "0");
+    const mm = String(m).padStart(2, "0");
+    return `${VN_WEEKDAYS[jsDate.getDay()]}, ${dd}/${mm}/${y}`;
+  }
+
+  // Đổi nhãn các ô "buổi lễ" theo bên đang chọn (Nhà Gái → Lễ Vu Quy,
+  // Nhà Trai → Lễ Thành Hôn) để bạn điền cho đỡ nhầm.
+  const benSelect = document.getElementById("benSelect");
+  function updateLeLabels() {
+    const isTrai = benSelect.value === "trai";
+    const leLabel = isTrai ? "Lễ Thành Hôn" : "Lễ Vu Quy";
+    document.getElementById("leNgayGioLabel").textContent = `🌿 ${leLabel} — giờ & ngày`;
+    document.getElementById("leDiaDiemLabel").textContent = `🌿 ${leLabel} — địa điểm (Enter để xuống dòng)`;
+    document.getElementById("leMapLabel").textContent = `🌿 ${leLabel} — link Google Maps (nút "Chỉ đường")`;
+  }
+  // Gợi ý sẵn giờ buổi lễ theo bên đang chọn (Nhà Gái: Lễ Vu Quy 8:00 —
+  // Nhà Trai: Lễ Thành Hôn 9:30), giữ nguyên ngày đang có sẵn trong ô (chỉ
+  // đổi phần giờ). Bạn vẫn có thể sửa tay nếu giờ/ngày thực tế khác.
+  function suggestTimeForSide() {
+    const suggestedTime = benSelect.value === "trai" ? "09:30" : "08:00";
+    const el = document.getElementById("leNgayGio");
+    const date = el.value.split("T")[0] || "2026-10-25";
+    el.value = `${date}T${suggestedTime}`;
+  }
+  benSelect.addEventListener("change", () => { updateLeLabels(); suggestTimeForSide(); });
+  updateLeLabels();
+
+  function eventParams() {
+    // Đọc các ô "Cài đặt ngày giờ & địa điểm" — ô nào trống thì bỏ qua (thiệp giữ mặc định).
+    const ben = benSelect.value; // "gai" hoặc "trai"
+    const leLabel = ben === "trai" ? "Lễ Thành Hôn" : "Lễ Vu Quy";
+    const leNgayGio = document.getElementById("leNgayGio").value;
+    const tiecNgayGio = document.getElementById("tiecNgayGio").value;
+
+    // Dòng hiển thị giờ = giờ (rút từ ô datetime-local) + ngày tự định dạng,
+    // giống đúng cách trang gốc đang hiển thị — không cần bạn gõ tay ngày.
+    const timeOnly = (dt) => (dt ? dt.split("T")[1] : "");
+    const leGio = leNgayGio
+      ? [timeOnly(leNgayGio), formatVNDate(leNgayGio)].filter(Boolean).join("<br/>")
+      : "";
+    const tiecGio = tiecNgayGio
+      ? [timeOnly(tiecNgayGio), formatVNDate(tiecNgayGio)].filter(Boolean).join("<br/>")
+      : "";
+
+    const fields = {
+      ben,
+      le_label: leLabel,
+      le_gio: leGio,
+      le_diadiem: document.getElementById("leDiaDiem").value.trim(),
+      le_map: document.getElementById("leMap").value.trim(),
+      tiec_gio: tiecGio,
+      tiec_diadiem: document.getElementById("tiecDiaDiem").value.trim(),
+      tiec_map: document.getElementById("tiecMap").value.trim(),
+    };
+    const params = new URLSearchParams();
+    Object.entries(fields).forEach(([k, v]) => { if (v) params.set(k, v); });
+
+    // Giờ buổi lễ quyết định phần đếm ngược + Âm lịch ở đầu thiệp.
+    if (leNgayGio) {
+      // <input type="datetime-local"> trả về giờ theo múi giờ máy tính của bạn;
+      // ta gắn thêm "+07:00" để trang luôn hiểu đúng là giờ Việt Nam dù khách
+      // mở link từ nước ngoài.
+      params.set("ngay", `${leNgayGio}:00+07:00`);
+    }
+    return params;
+  }
+
+  function makeLink(base, name) {
+    const clean = base.trim().replace(/\/$/, "");
+    const params = eventParams();
+    params.set("to", name);
+    return `${clean}/?${params.toString()}`;
+  }
+
+  document.getElementById("previewBtn").addEventListener("click", () => {
+    const base = (document.getElementById("baseUrl").value || "https://ten-cua-ban.vercel.app").trim().replace(/\/$/, "");
+    const params = eventParams();
+    params.set("to", "Xem thử");
+    window.open(`${base}/?${params.toString()}`, "_blank", "noopener");
+  });
+
+  genBtn.addEventListener("click", () => {
+    const base = document.getElementById("baseUrl").value || "https://ten-cua-ban.vercel.app";
+    const names = document.getElementById("names").value
+      .split("\n")
+      .map(n => n.trim())
+      .filter(Boolean);
+
+    tbody.innerHTML = "";
+    lastRows = [];
+
+    names.forEach((name) => {
+      const link = makeLink(base, name);
+      lastRows.push([name, link]);
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${name}</td>
+        <td><code>${link}</code></td>
+        <td><button class="copy-btn" type="button">Copy</button></td>
+      `;
+      tr.querySelector(".copy-btn").addEventListener("click", () => {
+        navigator.clipboard.writeText(link);
+        tr.querySelector(".copy-btn").textContent = "Đã copy!";
+        setTimeout(() => { tr.querySelector(".copy-btn").textContent = "Copy"; }, 1500);
+      });
+      tbody.appendChild(tr);
+    });
+
+    downloadBtn.style.display = names.length ? "inline-block" : "none";
+  });
+
+  downloadBtn.addEventListener("click", () => {
+    const header = "Ho ten,Link\n";
+    const rows = lastRows.map(([n, l]) => `"${n.replace(/"/g,'""')}","${l}"`).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "guest-links.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  genBtn.click();
+</script>
+</body>
+</html>
