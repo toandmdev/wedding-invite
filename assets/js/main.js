@@ -141,10 +141,28 @@
       music.querySelector("source[src]").getAttribute("src");
     if (music && hasSource) {
       music.volume = 0.5;
-      music.play().then(() => {
+      const tryPlay = () => music.play().then(() => {
         const toggle = document.getElementById("musicToggle");
         if (toggle) toggle.classList.add("playing");
-      }).catch(() => {/* autoplay bị chặn (hiếm khi xảy ra sau 1 cú click), khách có thể tự bấm nút nhạc */});
+        return true;
+      }).catch(() => false);
+
+      tryPlay().then((ok) => {
+        if (ok) return;
+        // Trên site đã deploy (không còn là file:// local), file nhạc cần tải qua mạng
+        // nên lần play() đầu tiên (ngay lúc bấm mở thiệp) đôi khi chưa kịp sẵn sàng và
+        // bị trình duyệt từ chối. Thay vì bắt khách phải tự tìm nút nhạc bấm lại nhiều
+        // lần, ta lắng nghe cú chạm/click kế tiếp bất kỳ trên trang và thử play() lại
+        // đúng 1 lần — vẫn tính là trong ngữ cảnh tương tác của người dùng nên trình
+        // duyệt sẽ cho phép.
+        const retry = () => {
+          document.removeEventListener("click", retry);
+          document.removeEventListener("touchend", retry);
+          tryPlay();
+        };
+        document.addEventListener("click", retry, { once: true });
+        document.addEventListener("touchend", retry, { once: true });
+      });
     }
     window.removeEventListener("keydown", onKey);
   }
@@ -471,7 +489,7 @@
     try {
       const lunar = new window.VNLunar.LunarDate(new Date(WEDDING_DATE));
       const leapText = lunar.isLeap ? " (nhuận)" : "";
-      const long = `Nhằm ngày ${lunar.date} tháng ${lunar.month}${leapText} năm ${lunar.lunarYear.can} ${lunar.lunarYear.chi} (Âm lịch)`;
+      const long = `Tức ngày ${lunar.date} tháng ${lunar.month}${leapText} năm ${lunar.lunarYear.can} ${lunar.lunarYear.chi} (Âm lịch)`;
       // Cả buổi lễ lẫn Tiệc Chung Vui hiện đều tính theo cùng một WEDDING_DATE,
       // nên dùng chung một dòng Âm lịch cho cả hai khung sự kiện.
       const tiecLunarEl = document.getElementById("eventTiecLunar");
