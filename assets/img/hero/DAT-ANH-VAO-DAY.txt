@@ -1,0 +1,5 @@
+Đặt ảnh cưới chính (dùng cho phần đầu trang) vào đây, đặt tên file:
+
+  anh-cuoi.jpg
+
+Ảnh nên là ảnh dọc (tỉ lệ khoảng 3:4) để hiển thị đẹp nhất.

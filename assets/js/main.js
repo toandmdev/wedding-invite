@@ -54,16 +54,30 @@
        ben         = "gai" hoặc "trai" — quyết định tên buổi lễ hiển thị
                      (mặc định "Lễ Vu Quy" nếu để trống/= "gai")
        le_label    = tự đặt tên buổi lễ khác đi nếu muốn (ghi đè cả "ben")
-       le_gio      = giờ + ngày buổi lễ      (vd: "9:00<br/>Thứ Bảy, 24/10/2026")
-       le_diadiem  = địa điểm buổi lễ (dùng \n cho xuống dòng, ví dụ %0A)
+       le_gio      = giờ + ngày buổi lễ      (vd: "Vào lúc 9:00<br/>Thứ Bảy, 24/10/2026")
+       le_diadiem  = địa điểm buổi lễ, hiện sau chữ "Tại:" (dùng \n cho xuống dòng, ví dụ %0A)
        le_map      = link Google Maps cho nút "Chỉ đường" của buổi lễ
        tiec_gio    = giờ + ngày Tiệc Chung Vui
-       tiec_diadiem= địa điểm Tiệc Chung Vui
+       tiec_diadiem= địa điểm Tiệc Chung Vui, hiện sau chữ "Tại:"
        tiec_map    = link Google Maps cho nút "Chỉ đường" của tiệc
      Dùng công cụ generate-links.html (mục "Cài đặt ngày giờ & địa điểm") để
      chọn bên + nhập giờ một lần rồi tự động sinh link đúng cho cả danh sách
      khách — không cần đụng vào code, và nhiều khách cùng giờ chỉ cần tạo 1 lần.
   --------------------------------------------------- */
+  // Địa chỉ + link bản đồ cố định của tư gia hai bên — cả "Tiệc Chung Vui" lẫn
+  // buổi lễ đều tổ chức tại nhà riêng của đúng bên đang xem thiệp (theo "ben"),
+  // nên dùng chung 2 hằng số này thay vì gõ lặp lại địa chỉ ở nhiều chỗ.
+  const HOME_TRAI = {
+    label: "Tư gia nhà trai",
+    address: "Thôn Anh Trỗi, Xã Quỳnh Lưu<br/>Tỉnh Ninh Bình",
+    map: "https://maps.app.goo.gl/PxKXKRXbYkmxokgb9",
+  };
+  const HOME_GAI = {
+    label: "Tư gia nhà gái",
+    address: "Xóm 1 Lỗi Sơn, Xã Gia Phong<br/>Tỉnh Ninh Bình",
+    map: "https://maps.app.goo.gl/Xgu69FonJWdBbjfi9",
+  };
+
   (function applyEventOverrides() {
     const p = new URLSearchParams(window.location.search);
     const setText = (id, key) => {
@@ -78,8 +92,24 @@
       const el = document.getElementById(id);
       if (el) el.href = val;
     };
+    const fillHome = (prefix, home) => {
+      const labelEl = document.getElementById(`${prefix}PlaceLabel`);
+      const placeEl = document.getElementById(`${prefix}Place`);
+      const linkEl = document.getElementById(`${prefix}MapLink`);
+      if (labelEl) labelEl.textContent = home.label;
+      if (placeEl) placeEl.innerHTML = home.address;
+      if (linkEl) linkEl.href = home.map;
+    };
 
     const ben = (p.get("ben") || "gai").toLowerCase();
+    const home = ben === "trai" ? HOME_TRAI : HOME_GAI;
+
+    // Mặc định: cả Tiệc Chung Vui và buổi lễ đều ở tư gia của đúng "ben" —
+    // ?tiec_diadiem=/?le_diadiem=... (và các tham số khác bên dưới) vẫn ghi đè
+    // được nếu một buổi lễ nào đó cần đổi riêng.
+    fillHome("eventTiec", home);
+    fillHome("eventLe", home);
+
     const defaultLeLabel = ben === "trai" ? "Lễ Thành Hôn" : "Lễ Vu Quy";
     const leLabelEl = document.getElementById("eventLeLabel");
     if (leLabelEl) leLabelEl.textContent = p.get("le_label") || defaultLeLabel;
@@ -167,24 +197,6 @@
   }, { threshold: 0.15, rootMargin: "0px 0px -8% 0px" });
   revealEls.forEach((el) => io.observe(el));
 
-  /* ---------- 5. Dot nav active state ---------- */
-  const sections = document.querySelectorAll("main .section, .footer");
-  const navLinks = document.querySelectorAll(".dot-nav a");
-  if (sections.length && navLinks.length) {
-    const navObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        const id = entry.target.getAttribute("id");
-        const link = document.querySelector(`.dot-nav a[href="#${id}"]`);
-        if (!link) return;
-        if (entry.isIntersecting) {
-          navLinks.forEach((l) => l.classList.remove("active"));
-          link.classList.add("active");
-        }
-      });
-    }, { threshold: 0.5 });
-    sections.forEach((s) => { if (s.id) navObserver.observe(s); });
-  }
-
   /* ---------- 6. Ngày giờ cưới + Countdown timer ----------
      Nhà trai và nhà gái tổ chức lễ/tiệc vào 2 ngày khác nhau (24/10 và
      25/10/2026), nên "ngày cưới" dùng để đếm ngược / tính Âm lịch / tạo
@@ -206,14 +218,50 @@
     const mm = String(date.getMonth() + 1).padStart(2, "0");
     return `${weekday}, ${dd}/${mm}/${date.getFullYear()}`;
   }
+  // Ô ngày dưới "Save The Date" chỉ hiện số ngày.tháng.năm (dạng "25 . 10 . 2026"),
+  // luôn tính theo WEDDING_DATE hiệu lực (mặc định hoặc ghi đè qua ?ngay=...).
   const heroDateEl = document.getElementById("heroDateLine");
-  if (heroDateEl && ngayParam) {
-    heroDateEl.textContent = `Save the date · ${formatVNDate(WEDDING_DATE)}`;
+  if (heroDateEl) {
+    const dd2 = String(WEDDING_DATE.getDate()).padStart(2, "0");
+    const mm2 = String(WEDDING_DATE.getMonth() + 1).padStart(2, "0");
+    heroDateEl.textContent = `${dd2} . ${mm2} . ${WEDDING_DATE.getFullYear()}`;
   }
   const countdownDateEl = document.getElementById("countdownDateLine");
   if (countdownDateEl) {
-    countdownDateEl.textContent = `Đếm ngược đến ngày cưới · ${formatVNDate(WEDDING_DATE)}`;
+    // Tách thành 2 dòng: "Đếm ngược đến ngày cưới" và ngày/thứ bên dưới.
+    countdownDateEl.innerHTML = `Đếm ngược đến ngày cưới<br />${formatVNDate(WEDDING_DATE)}`;
   }
+
+  /* ---------- 6b. Lịch tháng đánh dấu ngày cưới (giống mẫu tham khảo) ----------
+     Vẽ lưới lịch của đúng tháng có ngày cưới, khoanh tròn + gắn icon 💗 vào
+     đúng ngày (lấy từ WEDDING_DATE ở trên, đã tính theo link ?ngay=... nếu có).
+  --------------------------------------------------- */
+  (function renderWeddingCalendar() {
+    const monthLabelEl = document.getElementById("calMonthLabel");
+    const gridEl = document.getElementById("calGrid");
+    if (!monthLabelEl || !gridEl) return;
+
+    const year = WEDDING_DATE.getFullYear();
+    const month = WEDDING_DATE.getMonth(); // 0-indexed
+    const weddingDay = WEDDING_DATE.getDate();
+    monthLabelEl.textContent = `Tháng ${month + 1}`;
+
+    const firstDay = new Date(year, month, 1);
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    // Tuần bắt đầu từ Thứ 2 (T2..CN) — getDay() trả 0=CN..6=T7, quy đổi về 0=T2..6=CN.
+    const startOffset = (firstDay.getDay() + 6) % 7;
+
+    let html = "";
+    ["T2", "T3", "T4", "T5", "T6", "T7", "CN"].forEach((w) => {
+      html += `<div class="cal-weekday">${w}</div>`;
+    });
+    for (let i = 0; i < startOffset; i++) html += `<div class="cal-day empty"></div>`;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const isWedding = d === weddingDay;
+      html += `<div class="cal-day${isWedding ? " is-wedding-day" : ""}">${isWedding ? '<span class="cal-heart">♥</span>' : ""}${d}</div>`;
+    }
+    gridEl.innerHTML = html;
+  })();
 
   function pad(n) { return String(n).padStart(2, "0"); }
 
@@ -357,30 +405,24 @@
     imgEl.src = qr.createDataURL(8, 8);
   }
 
-  document.querySelectorAll(".btn-qr").forEach((btn) => {
-    const panel = btn.nextElementSibling;
-    const img = panel ? panel.querySelector("img") : null;
-    let generated = false;
-
-    btn.addEventListener("click", () => {
-      const isOpen = btn.getAttribute("aria-expanded") === "true";
-
-      if (!generated && img) {
-        const payload = buildVietQRPayload({
-          bin: btn.dataset.bin,
-          account: btn.dataset.account,
-          name: btn.dataset.name,
-          purpose: btn.dataset.purpose,
-        });
-        renderQrInto(img, payload);
-        generated = true;
-      }
-
-      btn.setAttribute("aria-expanded", String(!isOpen));
-      btn.textContent = isOpen ? "Xem mã QR chuyển khoản" : "Ẩn mã QR chuyển khoản";
-      if (panel) panel.classList.toggle("open", !isOpen);
+  // QR được tạo sẵn ngay khi mở popup "Hộp Mừng Cưới" (xem initGiftModal bên dưới),
+  // không cần bấm thêm nút "Xem mã QR" nữa.
+  let giftQrGenerated = false;
+  function generateAllGiftQr() {
+    if (giftQrGenerated) return;
+    document.querySelectorAll(".gift-card").forEach((card) => {
+      const img = card.querySelector(".qr-box img");
+      if (!img) return;
+      const payload = buildVietQRPayload({
+        bin: card.dataset.bin,
+        account: card.dataset.account,
+        name: card.dataset.name,
+        purpose: card.dataset.purpose,
+      });
+      renderQrInto(img, payload);
     });
-  });
+    giftQrGenerated = true;
+  }
 
   /* ---------- 10. Nút copy số tài khoản ---------- */
   document.querySelectorAll(".btn-copy").forEach((btn) => {
@@ -429,15 +471,16 @@
     try {
       const lunar = new window.VNLunar.LunarDate(new Date(WEDDING_DATE));
       const leapText = lunar.isLeap ? " (nhuận)" : "";
-      const short = `Nhằm ngày ${lunar.date}/${lunar.month}${leapText} năm ${lunar.lunarYear.can} ${lunar.lunarYear.chi} (Âm lịch)`;
-      const long = `Ngày ${lunar.date} tháng ${lunar.month}${leapText} năm ${lunar.lunarYear.can} ${lunar.lunarYear.chi} (Âm lịch)`;
-      const heroEl = document.getElementById("heroLunarDate");
-      const eventsEl = document.getElementById("eventsLunarDate");
-      if (heroEl) heroEl.textContent = short;
-      if (eventsEl) eventsEl.textContent = long;
+      const long = `Nhằm ngày ${lunar.date} tháng ${lunar.month}${leapText} năm ${lunar.lunarYear.can} ${lunar.lunarYear.chi} (Âm lịch)`;
+      // Cả buổi lễ lẫn Tiệc Chung Vui hiện đều tính theo cùng một WEDDING_DATE,
+      // nên dùng chung một dòng Âm lịch cho cả hai khung sự kiện.
+      const tiecLunarEl = document.getElementById("eventTiecLunar");
+      const leLunarEl = document.getElementById("eventLeLunar");
+      if (tiecLunarEl) tiecLunarEl.textContent = long;
+      if (leLunarEl) leLunarEl.textContent = long;
     } catch (err) {
       // Nếu thư viện lỗi vì lý do gì đó, chỉ ẩn dòng âm lịch đi, không ảnh hưởng phần còn lại của trang.
-      document.querySelectorAll("#heroLunarDate, #eventsLunarDate").forEach((el) => { if (el) el.hidden = true; });
+      document.querySelectorAll("#eventTiecLunar, #eventLeLunar").forEach((el) => { if (el) el.hidden = true; });
     }
   }
   renderLunarDate();
@@ -482,11 +525,123 @@
     });
   }
 
-  /* ---------- 13. Simple lightbox placeholder ---------- */
-  document.querySelectorAll(".gallery-item").forEach((item) => {
-    item.addEventListener("click", () => {
-      item.classList.toggle("expanded");
+  /* ---------- 13. Gallery: nút "Xem thêm" + Lightbox xem ảnh lớn (next/prev) ---------- */
+  (function initGallery() {
+    const grid = document.getElementById("galleryGrid");
+    const extraGrid = document.getElementById("galleryExtraGrid");
+    if (!grid) return;
+    // Gộp cả ảnh bento chính + ảnh trong lưới "xem thêm" (nếu có) theo đúng thứ tự trong DOM,
+    // để lightbox next/prev chạy xuyên suốt toàn bộ album chứ không chỉ 6 ảnh đầu.
+    const items = Array.from(document.querySelectorAll("#gallery .gallery-item"));
+    const photos = items.map((item) => {
+      const img = item.querySelector("img");
+      return img ? img.getAttribute("src") : "";
     });
-  });
+
+    // Nút "Xem thêm ảnh": chỉ hiện nếu có lưới ảnh phụ, bấm vào mới hiện các ảnh còn lại
+    const moreWrap = document.getElementById("galleryMoreWrap");
+    const moreBtn = document.getElementById("galleryMoreBtn");
+    if (moreWrap) {
+      if (!extraGrid || !extraGrid.querySelector(".gallery-item")) {
+        moreWrap.classList.add("is-hidden");
+      } else if (moreBtn) {
+        moreBtn.addEventListener("click", () => {
+          extraGrid.classList.add("is-visible");
+          moreWrap.classList.add("is-hidden");
+        });
+      }
+    }
+
+    // Lightbox
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightboxImg");
+    const lightboxCount = document.getElementById("lightboxCount");
+    const btnClose = document.getElementById("lightboxClose");
+    const btnPrev = document.getElementById("lightboxPrev");
+    const btnNext = document.getElementById("lightboxNext");
+    if (!lightbox || !lightboxImg) return;
+
+    let currentIdx = 0;
+
+    function showPhoto(idx) {
+      if (!photos.length) return;
+      currentIdx = (idx + photos.length) % photos.length;
+      lightboxImg.src = photos[currentIdx];
+      if (lightboxCount) lightboxCount.textContent = `${currentIdx + 1} / ${photos.length}`;
+    }
+
+    function openLightbox(idx) {
+      showPhoto(idx);
+      lightbox.classList.add("is-open");
+      lightbox.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove("is-open");
+      lightbox.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    items.forEach((item, idx) => {
+      item.addEventListener("click", () => openLightbox(idx));
+    });
+
+    if (btnClose) btnClose.addEventListener("click", closeLightbox);
+    if (btnPrev) btnPrev.addEventListener("click", () => showPhoto(currentIdx - 1));
+    if (btnNext) btnNext.addEventListener("click", () => showPhoto(currentIdx + 1));
+
+    // Bấm ra ngoài ảnh (vùng nền tối) để đóng
+    lightbox.addEventListener("click", (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    // Điều hướng bằng bàn phím khi lightbox đang mở
+    document.addEventListener("keydown", (e) => {
+      if (!lightbox.classList.contains("is-open")) return;
+      if (e.key === "Escape") closeLightbox();
+      else if (e.key === "ArrowLeft") showPhoto(currentIdx - 1);
+      else if (e.key === "ArrowRight") showPhoto(currentIdx + 1);
+    });
+
+    // Vuốt trái/phải trên điện thoại để chuyển ảnh
+    let touchStartX = null;
+    lightbox.addEventListener("touchstart", (e) => {
+      touchStartX = e.changedTouches[0].clientX;
+    }, { passive: true });
+    lightbox.addEventListener("touchend", (e) => {
+      if (touchStartX === null) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 40) showPhoto(currentIdx + (dx < 0 ? 1 : -1));
+      touchStartX = null;
+    }, { passive: true });
+  })();
+
+  /* ---------- 13b. Popup "Hộp Mừng Cưới" — chỉ hiện STK/QR khi bấm nút mở ---------- */
+  (function initGiftModal() {
+    const openBtn = document.getElementById("giftOpenBtn");
+    const modal = document.getElementById("giftModal");
+    const closeBtn = document.getElementById("giftModalClose");
+    if (!openBtn || !modal) return;
+
+    function openGiftModal() {
+      generateAllGiftQr();
+      modal.classList.add("is-open");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+    function closeGiftModal() {
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    openBtn.addEventListener("click", openGiftModal);
+    if (closeBtn) closeBtn.addEventListener("click", closeGiftModal);
+    modal.addEventListener("click", (e) => { if (e.target === modal) closeGiftModal(); });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal.classList.contains("is-open")) closeGiftModal();
+    });
+  })();
 
 })();

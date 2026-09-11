@@ -167,14 +167,14 @@ Gia đình Cô Chú C</textarea>
     const leNgayGio = document.getElementById("leNgayGio").value;
     const tiecNgayGio = document.getElementById("tiecNgayGio").value;
 
-    // Dòng hiển thị giờ = giờ (rút từ ô datetime-local) + ngày tự định dạng,
-    // giống đúng cách trang gốc đang hiển thị — không cần bạn gõ tay ngày.
+    // Dòng hiển thị giờ = "Vào lúc " + giờ (rút từ ô datetime-local) + ngày tự
+    // định dạng, giống đúng cách trang gốc đang hiển thị — không cần bạn gõ tay ngày.
     const timeOnly = (dt) => (dt ? dt.split("T")[1] : "");
     const leGio = leNgayGio
-      ? [timeOnly(leNgayGio), formatVNDate(leNgayGio)].filter(Boolean).join("<br/>")
+      ? [`Vào lúc ${timeOnly(leNgayGio)}`, formatVNDate(leNgayGio)].filter(Boolean).join("<br/>")
       : "";
     const tiecGio = tiecNgayGio
-      ? [timeOnly(tiecNgayGio), formatVNDate(tiecNgayGio)].filter(Boolean).join("<br/>")
+      ? [`Vào lúc ${timeOnly(tiecNgayGio)}`, formatVNDate(tiecNgayGio)].filter(Boolean).join("<br/>")
       : "";
 
     const fields = {

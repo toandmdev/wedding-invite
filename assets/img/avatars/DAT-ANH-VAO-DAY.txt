@@ -1,0 +1,7 @@
+Đặt ảnh đại diện tròn nhỏ (phần "Bạn là khách mời của" ở RSVP) vào đây,
+đặt tên file:
+
+  chu-re.jpg
+  co-dau.jpg
+
+Ảnh nên là ảnh vuông, cận mặt để hiện đẹp trong khung tròn nhỏ.

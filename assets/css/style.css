@@ -21,20 +21,46 @@
   --color-ivory-on-navy: #f2ece0;
 
   --font-script: "Alex Brush", "Brush Script MT", cursive;
-  --font-display: "Cormorant Garamond", "Times New Roman", serif;
+  /* Đổi font tiêu đề chính từ Judson (khá thẳng, cứng) sang Cormorant Garamond —
+     serif có nét mảnh, uốn mềm mại hơn, hợp không khí thiệp cưới. Judson vẫn giữ
+     làm fallback phòng khi font chưa kịp tải. */
+  --font-display: "Cormorant Garamond", "Judson", "Times New Roman", serif;
   --font-body: "Be Vietnam Pro", "Segoe UI", sans-serif;
 
-  --radius: 18px;
+  --radius: 18px;       /* thẻ/card cỡ vừa-lớn (event, gift, timer, rsvp...) */
+  --radius-sm: 12px;     /* ô nhập liệu, khung nhỏ (input, textarea, envelope...) */
   --shadow-soft: 0 20px 50px -25px rgba(30, 32, 43, 0.35);
   --transition: 0.5s cubic-bezier(.22,.61,.36,1);
+  --shell-max: 480px; /* bề ngang tối đa của khung thiệp, dùng để căn các phần
+                          tử position:fixed (nút nhạc, nav chấm...) đúng theo
+                          mép khung thay vì mép trình duyệt trên màn hình rộng */
+
+  /* Viền trắng mờ dùng trên nền navy (guestbook/rsvp/gift) — gộp về 3 mức trong
+     suốt để các khung/input/nút đồng nhất thay vì mỗi chỗ một giá trị khác nhau. */
+  --border-navy-soft: rgba(255, 255, 255, 0.18);
+  --border-navy: rgba(255, 255, 255, 0.28);
+  --border-navy-strong: rgba(255, 255, 255, 0.45);
 }
 
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  /* Nền phía sau khung thiệp khi mở trên màn hình rộng (web/desktop) */
+  background: #e7e1d2;
+}
 
 body {
-  margin: 0;
+  margin: 0 auto;
+  /* Giới hạn bề ngang giống mở trên điện thoại, kể cả khi mở bằng web/desktop,
+     để layout/ảnh không bị kéo giãn, vỡ hay cắt xén trên màn hình rộng.
+     Lưu ý: KHÔNG dùng transform ở đây để tạo containing block cho position:fixed
+     — làm vậy sẽ khiến các phần tử fixed (nút nhạc, nav chấm...) bị "khoá"
+     theo chiều cao của cả trang thay vì luôn nổi theo màn hình khi cuộn.
+     Các phần tử fixed bên dưới tự canh theo --shell-max bằng calc() thay thế. */
+  max-width: var(--shell-max);
+  position: relative;
+  box-shadow: 0 0 60px rgba(20, 20, 30, 0.18);
   background: var(--color-bg);
   color: var(--color-ink);
   font-family: var(--font-body);
@@ -48,9 +74,10 @@ a { color: inherit; text-decoration: none; }
 
 .eyebrow {
   font-family: var(--font-body);
-  letter-spacing: 0.3em;
+  letter-spacing: 0.26em; /* bớt giãn chữ một chút cho dễ đọc, mềm hơn so với 0.3em trước đây */
   text-transform: uppercase;
   font-size: 0.72rem;
+  line-height: 1.7; /* đủ giãn dòng cho các trường hợp xuống 2 dòng (vd countdown) */
   color: var(--color-navy-soft);
   font-weight: 600;
   margin: 0 0 10px;
@@ -72,7 +99,8 @@ a { color: inherit; text-decoration: none; }
 
 .section-title {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: 600; /* nhẹ hơn 700 trước đây — Cormorant Garamond ở 600 vẫn nổi bật nhưng mềm mại hơn */
+  letter-spacing: 0.01em;
   font-size: clamp(2rem, 5vw, 3rem);
   margin: 0 0 40px;
   color: var(--color-navy-dark);
@@ -82,7 +110,11 @@ a { color: inherit; text-decoration: none; }
 
 .section {
   position: relative;
-  padding: 50px 6vw;
+  /* Dùng % thay vì vw: % tính theo bề ngang khung thiệp (đã giới hạn 480px ở
+     body) chứ không theo bề ngang trình duyệt, nên padding không bị "phồng"
+     to ra và ép nhỏ nội dung bên trong khi mở bằng web/desktop.
+     Padding trên/dưới giảm từ 60px xuống 40px để các section gần nhau hơn. */
+  padding: 40px 6%;
   max-width: 1100px;
   margin: 0 auto;
 }
@@ -106,7 +138,14 @@ a { color: inherit; text-decoration: none; }
 /* ---------------- Envelope intro ---------------- */
 #envelope-screen {
   position: fixed;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  /* Canh giữa và giới hạn theo đúng bề ngang khung thiệp (--shell-max) thay vì
+     inset:0 (vốn luôn bung hết chiều rộng trình duyệt). */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--shell-max);
   z-index: 999;
   display: flex;
   flex-direction: column;
@@ -131,7 +170,7 @@ a { color: inherit; text-decoration: none; }
   inset: 0;
   background: linear-gradient(180deg, var(--color-white), var(--color-bg-alt));
   border: 1px solid var(--color-line);
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-soft);
 }
 .envelope-flap {
@@ -159,7 +198,7 @@ a { color: inherit; text-decoration: none; }
   right: 8%;
   background: var(--color-white);
   border: 1px solid var(--color-line);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 18px 14px;
   text-align: center;
   box-shadow: 0 10px 25px -12px rgba(0,0,0,0.25);
@@ -201,7 +240,9 @@ body.locked { overflow: hidden; height: 100vh; }
 .music-toggle {
   position: fixed;
   bottom: 22px;
-  right: 22px;
+  /* Khi màn hình rộng hơn khung thiệp, đẩy vào theo đúng mép phải của khung
+     (đã căn giữa) thay vì dính vào mép phải trình duyệt. */
+  right: max(22px, calc((100vw - var(--shell-max)) / 2 + 22px));
   z-index: 500;
   width: 52px;
   height: 52px;
@@ -219,131 +260,114 @@ body.locked { overflow: hidden; height: 100vh; }
 .music-toggle.playing .disc { animation-play-state: running; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ---------------- Dot nav ---------------- */
-.dot-nav {
-  position: fixed;
-  right: 26px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 400;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.dot-nav a {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--color-line);
-  position: relative;
-  transition: background var(--transition), transform var(--transition);
-}
-.dot-nav a.active { background: var(--color-navy); transform: scale(1.4); }
-.dot-nav a::after {
-  content: attr(data-label);
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  white-space: nowrap;
-  font-size: 0.7rem;
-  background: var(--color-ink);
-  color: #fff;
-  padding: 4px 10px;
-  border-radius: 6px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease;
-}
-.dot-nav a:hover::after { opacity: 1; }
-@media (max-width: 720px) { .dot-nav { display: none; } }
-
-/* ---------------- Hero (full-bleed, ảnh nền + chữ viết tay lớn) ---------------- */
+/* ---------------- Hero (ảnh cưới full-bleed phía trên + khối thông tin nền ivory phía dưới) ---------------- */
 .hero {
-  min-height: 80svh;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  display: block;
   text-align: center;
-  padding: 0 0 64px;
+  padding: 0;
   max-width: none;
 }
-.hero-bg {
+
+/* Khối ảnh cưới: tên cô dâu chú rể viết thảo phủ trực tiếp lên ảnh, giống mẫu tham khảo */
+.hero-photo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  max-height: 86vh;
+  overflow: hidden;
+  background: linear-gradient(160deg, #4a5f80 0%, #2a3b56 55%, #1c2740 100%);
+}
+.hero-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+.hero-photo-fallback {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(20,26,38,0.15) 0%, rgba(20,26,38,0.55) 78%, rgba(20,26,38,0.78) 100%),
     radial-gradient(circle at 30% 25%, rgba(90,110,145,0.55), transparent 55%),
-    radial-gradient(circle at 75% 70%, rgba(60,79,110,0.7), transparent 60%),
-    linear-gradient(160deg, #4a5f80 0%, #2a3b56 55%, #1c2740 100%);
-  z-index: -1;
+    radial-gradient(circle at 75% 70%, rgba(60,79,110,0.7), transparent 60%);
 }
-.hero-content { max-width: 640px; padding: 0 24px; }
-.hero-eyebrow {
-  color: #dfe6f2;
-  font-size: 0.75rem;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  margin: 0 0 18px;
+.hero-photo::after {
+  /* Gradient tối nhẹ phía chân ảnh để chữ trắng luôn đọc rõ dù ảnh sáng màu */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgba(10,14,24,0.45) 100%);
+  pointer-events: none;
 }
-.couple-names {
+.hero-photo-names {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6%;
+  z-index: 2;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   font-family: var(--font-script);
   font-weight: 400;
-  font-size: clamp(3.4rem, 13vw, 6.5rem);
-  margin: 0 0 22px;
   color: #ffffff;
-  line-height: 1.3;
-  text-shadow: 0 8px 30px rgba(0,0,0,0.35);
+  line-height: 1.05;
+  text-shadow: 0 10px 34px rgba(0,0,0,0.4), 0 2px 10px rgba(0,0,0,0.3);
 }
-.couple-names .amp {
-  display: block;
-  font-size: 0.5em;
-  color: #cfd9ea;
-  margin: 4px 0;
-  line-height: 1.3;
+.hero-name { font-size: clamp(3rem, 15vw, 5.6rem); }
+.hero-amp { font-size: clamp(2.1rem, 10vw, 3.8rem); margin: -0.08em 0; color: #eef2f8; }
+
+/* Khối thông tin nền ivory bên dưới ảnh */
+.hero-info { padding: 48px 6% 30px; max-width: 640px; margin: 0 auto; }
+.hero-eyebrow {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: clamp(1.3rem, 4.6vw, 1.8rem);
+  line-height: 1.6;
+  color: var(--color-navy-dark);
+  margin: 0 0 20px;
+}
+.hero-savedate {
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 9vw, 3.6rem);
+  color: var(--color-navy);
+  margin: 0 0 8px;
 }
 .hero-date {
   font-family: var(--font-display);
-  font-size: 1.2rem;
-  letter-spacing: 0.25em;
-  color: #f1efe9;
-  margin: 4px 0 4px;
+  font-weight: 600;
+  font-size: clamp(1.2rem, 4vw, 1.5rem);
+  letter-spacing: 0.18em; /* bớt giãn so với 0.22em cho mềm mại, dễ đọc hơn */
+  color: var(--color-navy-dark);
+  margin: 0 0 8px;
 }
-.hero-date-lunar {
-  font-size: 0.76rem;
-  letter-spacing: 0.04em;
-  color: #cfd9ea;
-  margin: 0 0 22px;
-  font-style: italic;
-}
-.guest-line { font-size: 1rem; color: #ece7db; }
-.guest-line strong { color: #ffffff; border-bottom: 1px solid rgba(255,255,255,0.5); padding-bottom: 1px; }
 
-.scroll-hint {
-  display: inline-block;
-  margin-top: 40px;
-  width: 22px;
-  height: 36px;
-  border: 2px solid rgba(255,255,255,0.55);
-  border-radius: 12px;
-  position: relative;
+/* Lịch tháng đánh dấu ngày cưới, giờ hiển thị ngay dưới hero-date */
+.hero-info .wedding-calendar { margin: 26px auto 30px; }
+
+.guest-line { font-size: 1rem; color: var(--color-ink-soft); margin: 0 0 30px; }
+.guest-line strong { color: var(--color-navy-dark); border-bottom: 1px solid var(--color-line); padding-bottom: 1px; }
+
+/* Tên chú rể / cô dâu — thay cho phần tiêu đề từng bị lặp lại ở khối "Hai gia đình".
+   Thiết kế lặp lại đúng công thức của .hero-photo-names (xếp dọc, chữ thảo cỡ lớn,
+   dấu & nhỏ hơn xen giữa), chỉ đổi màu cho hợp nền ivory sáng thay vì ảnh nền tối. */
+.hero-couple-names {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 4px 0 6px;
+  font-family: var(--font-script);
+  font-weight: 400;
+  color: var(--color-navy-dark);
+  line-height: 1.05;
 }
-.scroll-hint span {
-  position: absolute;
-  top: 6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  height: 8px;
-  background: #fff;
-  border-radius: 2px;
-  animation: scrollDown 1.8s ease infinite;
-}
-@keyframes scrollDown {
-  0% { opacity: 1; top: 6px; }
-  70% { opacity: 0; top: 18px; }
-  100% { opacity: 0; top: 18px; }
-}
+.hero-couple-name { font-size: clamp(2.6rem, 13vw, 4.6rem); }
+.hero-couple-amp { font-size: clamp(1.9rem, 9vw, 3.2rem); margin: -0.08em 0; color: var(--color-rose); }
 
 /* ---------------- Story / timeline ---------------- */
 .timeline {
@@ -376,6 +400,7 @@ body.locked { overflow: hidden; height: 100vh; }
 }
 .timeline-item h3 {
   font-family: var(--font-display);
+  font-weight: 600;
   font-size: 1.6rem;
   margin: 2px 0 6px;
   color: var(--color-ink);
@@ -385,86 +410,246 @@ body.locked { overflow: hidden; height: 100vh; }
 /* ---------------- Countdown (nền sáng, chữ script lớn + ô số) ---------------- */
 .countdown { text-align: center; }
 .countdown-inner { max-width: 720px; margin: 0 auto; }
+/* Luôn giữ 4 ô (ngày/giờ/phút/giây) trên 1 hàng, không cho xuống dòng — co giãn
+   padding/khoảng cách/cỡ chữ bằng clamp() theo bề ngang khung thiệp thay vì bọc
+   dòng khi màn hình hẹp. */
 .timer {
   display: flex;
   justify-content: center;
-  gap: clamp(10px, 3vw, 22px);
+  gap: clamp(6px, 2.4vw, 22px);
   margin: 26px 0 34px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 .timer-block {
+  flex: 1 1 0;
+  max-width: 100px;
   background: var(--color-white);
   border: 1px solid var(--color-line);
   box-shadow: var(--shadow-soft);
   border-radius: var(--radius);
-  padding: 18px 16px;
-  min-width: 84px;
+  padding: clamp(10px, 3vw, 18px) clamp(4px, 2vw, 16px);
+  min-width: 0;
 }
 .timer-block .num {
   display: block;
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  font-size: clamp(1.3rem, 6.2vw, 2.6rem);
   color: var(--color-navy-dark);
 }
 .timer-block .label {
-  font-size: 0.72rem;
-  letter-spacing: 0.15em;
+  font-size: clamp(0.56rem, 1.9vw, 0.72rem);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-ink-soft);
+  white-space: nowrap;
 }
 
 .btn-outline {
   display: inline-block;
   border: 1px solid var(--color-navy);
   color: var(--color-navy);
+  /* Reset nền/appearance mặc định của trình duyệt cho <button> — nếu không
+     button sẽ có nền xám/trắng riêng của UA đè lên, khiến chữ màu sáng
+     (vd trên nền navy) gần như vô hình cho tới khi bấm/focus đổi trạng thái. */
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+  cursor: pointer;
   padding: 12px 26px;
   border-radius: 999px;
   font-size: 0.9rem;
   transition: background var(--transition), color var(--transition);
 }
 .btn-outline:hover { background: var(--color-navy); color: var(--color-white); }
-.btn-outline.on-navy { border-color: rgba(255,255,255,0.55); color: var(--color-ivory-on-navy); }
+.btn-outline.on-navy { border-color: var(--border-navy-strong); color: var(--color-ivory-on-navy); }
 .btn-outline.on-navy:hover { background: var(--color-white); color: var(--color-navy-dark); }
 .btn-outline.sm { padding: 8px 18px; font-size: 0.8rem; }
 
 /* ---------------- Gallery ---------------- */
+/* Bố cục "bento" cố định cho 6 ảnh chính: 1 ảnh lớn nổi bật + xen kẽ ảnh dọc/ngang/
+   vuông nhỏ, đặt vị trí rõ ràng bằng grid-template-areas (không dùng auto-flow dense
+   — dễ tạo khoảng hở/lệch khó lường). 4 ảnh còn lại nằm trong 1 lưới vuông đơn giản
+   riêng, ẩn cho tới khi bấm "Xem thêm ảnh" — giảm số ảnh hiện ngay từ đầu để bố cục
+   không bị rối. */
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 96px);
+  grid-template-areas:
+    "a a b c"
+    "a a d c"
+    "e e d f";
+  gap: 8px;
 }
+.gallery-a { grid-area: a; }
+.gallery-b { grid-area: b; }
+.gallery-c { grid-area: c; }
+.gallery-d { grid-area: d; }
+.gallery-e { grid-area: e; }
+.gallery-f { grid-area: f; }
 .gallery-item {
-  aspect-ratio: 3/4;
+  position: relative;
   border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  background: linear-gradient(140deg, #93a6c4, #58718f);
+  transition: transform var(--transition);
+}
+.gallery-item img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.gallery-item:hover { transform: scale(1.03); z-index: 1; }
+
+/* Lưới ảnh "xem thêm": 3 cột vuông đều nhau, ẩn mặc định */
+.gallery-grid--extra {
+  display: none;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: none;
+  grid-template-areas: none;
+  margin-top: 8px;
+}
+.gallery-grid--extra.is-visible { display: grid; }
+.gallery-grid--extra .gallery-item { aspect-ratio: 1 / 1; }
+
+.gallery-more-wrap { text-align: center; margin-top: 22px; }
+.gallery-more-wrap.is-hidden { display: none; }
+@media (max-width: 420px) {
+  .gallery-grid { grid-template-rows: repeat(3, 80px); gap: 6px; }
+  .gallery-grid--extra { gap: 6px; }
+}
+
+/* ---------------- Lightbox xem ảnh lớn ---------------- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255,255,255,0.9);
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform var(--transition);
+  background: rgba(10, 14, 24, 0.92);
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
 }
-.gallery-item:hover { transform: translateY(-6px) scale(1.02); }
-.g1 { background: linear-gradient(140deg,#5b7398,#3c4f6e); }
-.g2 { background: linear-gradient(140deg,#7c8fae,#3c4f6e); grid-row: span 2; aspect-ratio: 3/5.2; }
-.g3 { background: linear-gradient(140deg,#b3596f,#8a4258); }
-.g4 { background: linear-gradient(140deg,#3c4f6e,#2a3b56); }
-.g5 { background: linear-gradient(140deg,#93a6c4,#58718f); }
-.g6 { background: linear-gradient(140deg,#8a4258,#b3596f); }
-.gallery-note { text-align: center; margin-top: 22px; font-size: 0.85rem; color: var(--color-ink-soft); }
-.gallery-note code { background: var(--color-bg-alt); padding: 2px 6px; border-radius: 4px; }
+.lightbox.is-open { opacity: 1; pointer-events: auto; }
+.lightbox-stage {
+  position: relative;
+  max-width: min(94vw, 720px);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.lightbox-stage img {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+  object-fit: contain;
+  background: #1a2436;
+}
+.lightbox-count {
+  margin: 12px 0 0;
+  color: #e7ecf5;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+}
+.lightbox-close,
+.lightbox-nav {
+  position: fixed;
+  border: none;
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  font-size: 1.5rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition);
+}
+.lightbox-close:hover,
+.lightbox-nav:hover { background: rgba(255,255,255,0.24); }
+.lightbox-close { top: 18px; right: 18px; }
+.lightbox-nav { top: 50%; transform: translateY(-50%); }
+.lightbox-prev { left: max(10px, calc((100vw - var(--shell-max)) / 2 - 44px)); }
+.lightbox-next { right: max(10px, calc((100vw - var(--shell-max)) / 2 - 44px)); }
 @media (max-width: 640px) {
-  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
-  .g2 { grid-row: span 1; aspect-ratio: 3/4; }
+  .lightbox-prev { left: 8px; }
+  .lightbox-next { right: 8px; }
+  .lightbox-close { top: 10px; right: 10px; }
+}
+
+/* ---------------- Lịch tháng (giống mẫu tham khảo, đánh dấu ngày cưới) ---------------- */
+.wedding-calendar {
+  max-width: 340px;
+  margin: 0 auto 40px;
+  text-align: center;
+}
+.calendar-month {
+  font-family: var(--font-script);
+  font-size: clamp(2rem, 6vw, 2.6rem);
+  color: var(--color-navy-dark);
+  margin: 0 0 18px;
+  line-height: 1.3;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px 2px;
+}
+.cal-weekday {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-navy-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding-bottom: 6px;
+}
+.cal-day {
+  position: relative;
+  aspect-ratio: 1/1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--color-ink);
+  border-radius: 50%;
+}
+.cal-day.is-wedding-day {
+  background: var(--color-navy);
+  color: #fff;
+  font-weight: 700;
+}
+.cal-heart {
+  position: absolute;
+  top: -9px;
+  font-size: 0.8rem;
+  color: var(--color-rose);
 }
 
 /* ---------------- Events ---------------- */
+/* Luôn xếp dọc 1 cột (2 dòng cho 2 sự kiện) giống giao diện điện thoại — kể cả khi
+   mở bằng web. Trước đây dùng @media (max-width: 720px) để chuyển 1 cột, nhưng
+   media query tính theo chiều rộng trình duyệt thật chứ không theo khung thiệp đã
+   giới hạn còn --shell-max (480px), nên trên màn hình rộng nó vẫn hiển thị 2 cột
+   chen nhau trong khung hẹp. Bỏ hẳn layout 2 cột, chỉ dùng 1 cột cố định. */
 .events-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 22px;
   margin-bottom: 34px;
 }
@@ -477,12 +662,10 @@ body.locked { overflow: hidden; height: 100vh; }
   box-shadow: var(--shadow-soft);
 }
 .event-icon { font-size: 2rem; margin-bottom: 10px; }
-.event-card h3 { font-family: var(--font-display); font-size: 1.5rem; margin: 0 0 10px; color: var(--color-navy-dark); }
-.event-time { font-weight: 600; color: var(--color-rose); margin: 0 0 10px; }
+.event-card h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.5rem; margin: 0 0 10px; color: var(--color-navy-dark); }
+.event-time { font-weight: 600; color: var(--color-rose); margin: 0 0 6px; }
+.event-lunar { font-size: 0.82rem; font-style: italic; color: var(--color-navy-soft); margin: 0 0 12px; }
 .event-place { color: var(--color-ink-soft); line-height: 1.6; margin: 0 0 18px; }
-.map-embed { border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-soft); }
-.map-embed iframe { width: 100%; height: 320px; border: 0; display: block; }
-@media (max-width: 720px) { .events-grid { grid-template-columns: 1fr; } }
 
 /* ---------------- RSVP ---------------- */
 .rsvp-sub { text-align: center; color: #d7deec; max-width: 480px; margin: 0 auto 30px; }
@@ -490,7 +673,7 @@ body.locked { overflow: hidden; height: 100vh; }
   max-width: 520px;
   margin: 0 auto;
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid var(--border-navy-soft);
   border-radius: var(--radius);
   padding: 34px;
   backdrop-filter: blur(2px);
@@ -503,8 +686,8 @@ body.locked { overflow: hidden; height: 100vh; }
 .form-row textarea {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid rgba(255,255,255,0.25);
-  border-radius: 10px;
+  border: 1px solid var(--border-navy);
+  border-radius: var(--radius-sm);
   font-family: var(--font-body);
   font-size: 0.95rem;
   background: rgba(255,255,255,0.92);
@@ -534,19 +717,29 @@ body.locked { overflow: hidden; height: 100vh; }
   padding: 4px;
 }
 .side-avatar {
+  position: relative;
   width: 64px;
   height: 64px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
   font-family: var(--font-display);
   font-size: 1.4rem;
   color: #fff;
   background: rgba(255,255,255,0.12);
-  border: 2px solid rgba(255,255,255,0.35);
+  border: 2px solid var(--border-navy-strong);
   transition: border-color var(--transition), transform var(--transition), background var(--transition);
 }
+.side-avatar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.side-avatar-fallback { position: relative; z-index: 0; }
 .side-btn[data-side="groom"] .side-avatar { background: linear-gradient(140deg,#5b7398,#3c4f6e); }
 .side-btn[data-side="bride"] .side-avatar { background: linear-gradient(140deg,#b3596f,#8a4258); }
 .side-btn.active .side-avatar { border-color: #fff; transform: translateY(-3px) scale(1.05); }
@@ -571,7 +764,7 @@ body.locked { overflow: hidden; height: 100vh; }
   margin: 24px auto 0;
   text-align: center;
   background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.25);
+  border: 1px solid var(--border-navy);
   border-radius: var(--radius);
   padding: 20px;
   font-size: 1rem;
@@ -579,65 +772,65 @@ body.locked { overflow: hidden; height: 100vh; }
 }
 
 /* ---------------- Gift ---------------- */
+/* Nội dung chỉ còn 1 nút mở popup nên giảm bớt padding trên-dưới của section này. */
+.section.gift { padding-top: 18px; padding-bottom: 18px; }
+.gift-trigger-wrap { text-align: center; }
+.btn-gift {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-rose);
+  border: none;
+  color: #fff;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 16px 34px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 10px 28px rgba(179, 89, 111, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background var(--transition);
+}
+.btn-gift:hover {
+  background: #c56a80;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(179, 89, 111, 0.5);
+}
 .gift-sub { text-align: center; color: #d7deec; max-width: 520px; margin: 0 auto 34px; }
-.gift-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 640px; margin: 0 auto; }
+/* Luôn 1 cột (giống mobile) — @media theo chiều rộng trình duyệt thật không khớp
+   với khung thiệp đã giới hạn còn --shell-max, nên cố định 1 cột cho nhất quán. */
+.gift-cards { display: grid; grid-template-columns: 1fr; gap: 20px; max-width: 420px; margin: 0 auto; }
 .gift-card {
   background: rgba(255,255,255,0.06);
-  border: 1px dashed rgba(255,255,255,0.3);
+  border: 1px dashed var(--border-navy);
   border-radius: var(--radius);
   padding: 26px;
   text-align: center;
 }
-.gift-card h3 { font-family: var(--font-display); margin: 0 0 8px; color: #fff; }
+.gift-card h3 { font-family: var(--font-display); font-weight: 600; margin: 0 0 8px; color: #fff; }
 .gift-card p { margin: 4px 0; color: #d7deec; }
 .gift-card .acc { font-weight: 600; color: #fff; letter-spacing: 0.04em; }
-@media (max-width: 640px) { .gift-cards { grid-template-columns: 1fr; } }
 
-/* ---- Nút xem QR + khung QR mở/đóng ---- */
-.btn-qr {
-  margin-top: 16px;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.5);
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 999px;
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background var(--transition), color var(--transition), transform 0.2s ease;
+/* ---- Popup "Hộp Mừng Cưới": chỉ hiện toàn bộ STK/QR khi bấm nút mở ---- */
+.gift-modal-stage {
+  max-width: min(94vw, 480px);
+  max-height: 86vh;
+  overflow-y: auto;
+  background: rgba(20, 28, 46, 0.98);
+  border: 1px solid var(--border-navy-soft);
+  border-radius: var(--radius);
+  padding: 36px 22px 28px;
 }
-.btn-qr::after {
-  content: "▾";
-  display: inline-block;
-  margin-left: 6px;
-  transition: transform 0.3s ease;
-}
-.btn-qr:hover { transform: translateY(-1px); }
-.btn-qr[aria-expanded="true"] {
-  background: var(--color-white);
-  color: var(--color-navy-dark);
-}
-.btn-qr[aria-expanded="true"]::after { transform: rotate(180deg); }
+.gift-modal-stage .gift-sub { margin: 0 auto 26px; }
 
-.qr-panel {
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  margin-top: 0;
-  transition: max-height 0.5s cubic-bezier(.22,.61,.36,1), opacity 0.4s ease, margin-top 0.5s ease;
-}
-.qr-panel.open {
-  max-height: 420px;
-  opacity: 1;
-  margin-top: 18px;
-}
+/* ---- Khung QR: hiện sẵn ngay khi mở popup, không cần bấm thêm nút nào ---- */
+.qr-panel { margin-top: 18px; }
 .qr-box {
   width: 190px;
   height: 190px;
   margin: 0 auto;
   background: var(--color-white);
-  border-radius: 14px;
+  border-radius: var(--radius-sm);
   padding: 10px;
   box-shadow: var(--shadow-soft);
   display: flex;
@@ -656,7 +849,7 @@ body.locked { overflow: hidden; height: 100vh; }
 .btn-copy {
   display: inline-block;
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.35);
+  border: 1px solid var(--border-navy-strong);
   color: #d7deec;
   padding: 8px 16px;
   border-radius: 999px;
@@ -675,6 +868,9 @@ body.locked { overflow: hidden; height: 100vh; }
 .btn-download:hover { background: transparent; color: #fff; }
 
 /* ---------------- Family (hai gia đình) — ảnh polaroid nghiêng ---------------- */
+/* Section này nối ngay sau khối hero-info nên không cần khoảng đệm phía trên
+   như các section khác (vốn dùng chung padding-top 40px của .section). */
+.family { padding-top: 16px; }
 .family-grid {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -698,8 +894,10 @@ body.locked { overflow: hidden; height: 100vh; }
 .family-card:nth-child(3) .family-photo { transform: rotate(4deg); }
 .family-card:hover .family-photo { transform: rotate(0deg) scale(1.03); }
 .family-photo-inner {
+  position: relative;
   aspect-ratio: 4/5;
   border-radius: 2px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -707,28 +905,66 @@ body.locked { overflow: hidden; height: 100vh; }
   font-size: 1rem;
   color: rgba(255,255,255,0.9);
 }
+.family-photo-inner img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.family-photo-inner .photo-fallback { position: relative; z-index: 0; }
 .family-card:nth-child(1) .family-photo-inner { background: linear-gradient(150deg,#5b7398,#2a3b56); }
 .family-card:nth-child(3) .family-photo-inner { background: linear-gradient(150deg,#b3596f,#6e3346); }
+/* Chữ trong family-card trước đây dùng sans-serif in hoa, đậm, giãn chữ rộng —
+   nhìn khá thô/cứng. Đổi "Nhà Trai/Nhà Gái" sang nhẹ ký hơn (500, giãn ít lại,
+   màu hồng ấm), còn tên ông bà & địa chỉ chuyển sang font-display (Cormorant
+   Garamond, có dáng nghiêng mềm) thay vì sans-serif, cho mềm mại và trang trọng
+   hơn — hợp với phong cách thiệp cưới. */
+/* Đổi "Nhà Trai/Nhà Gái" từ in hoa sang chữ thường kiểu nghiêng (cùng font-display
+   với tên & địa chỉ) — mềm mại hơn hẳn so với uppercase letter-spacing rộng, đồng
+   thời tăng cỡ chữ toàn bộ khối cho dễ đọc, nổi bật hơn. */
 .family-side {
-  margin: 0 0 6px;
-  font-size: 0.72rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--color-navy-soft);
-  font-weight: 600;
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  color: var(--color-rose);
+  font-weight: 500;
 }
 .family-card h3 {
   font-family: var(--font-display);
+  font-weight: 600;
   font-size: 1.4rem;
   margin: 0 0 14px;
   color: var(--color-navy-dark);
 }
 .family-parents {
   margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 400;
   color: var(--color-ink);
-  line-height: 1.8;
+  line-height: 1.7;
 }
-.family-address { margin: 0; font-size: 0.85rem; color: var(--color-ink-soft); }
+.family-parents strong { font-weight: 600; color: var(--color-navy-dark); }
+.family-address {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--color-ink-soft);
+}
+/* Địa chỉ có thể bấm để mở bản đồ chỉ đường — giữ nguyên kiểu chữ, chỉ thêm
+   gạch chân mờ để gợi ý đây là link, tránh màu xanh mặc định của trình duyệt. */
+.family-address a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--color-line);
+  text-underline-offset: 3px;
+  transition: color var(--transition);
+}
+.family-address a:hover { color: var(--color-navy); }
 .family-divider {
   font-family: var(--font-script);
   font-size: 2.2rem;
@@ -737,18 +973,27 @@ body.locked { overflow: hidden; height: 100vh; }
   text-align: center;
 }
 @media (max-width: 640px) {
-  .family-grid { grid-template-columns: 1fr; }
+  /* Vẫn giữ 2 cột (Nhà Trai / Nhà Gái) cùng một hàng trên điện thoại,
+     chỉ thu nhỏ khoảng cách + cỡ chữ để vừa màn hình hẹp. */
+  .family-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .family-divider { display: none; }
+  .family-photo { padding: 7px 7px 18px; max-width: none; }
+  .family-card:nth-child(1) .family-photo,
+  .family-card:nth-child(3) .family-photo { transform: rotate(-2deg); }
+  .family-card:nth-child(3) .family-photo { transform: rotate(2deg); }
+  .family-side { font-size: 0.88rem; letter-spacing: 0.01em; }
+  .family-card h3 { font-size: 1rem; margin: 0 0 8px; line-height: 1.3; }
+  .family-parents { font-size: 0.98rem; line-height: 1.5; }
+  .family-address { font-size: 0.88rem; }
+}
+@media (max-width: 380px) {
+  .family-card h3 { font-size: 0.9rem; }
+  .family-side { font-size: 0.8rem; }
+  .family-parents { font-size: 0.9rem; }
+  .family-address { font-size: 0.8rem; }
 }
 
-/* ---------------- Events extras: ngày âm lịch + dress code ---------------- */
-.events-lunar {
-  text-align: center;
-  margin: 0 0 34px;
-  font-size: 0.85rem;
-  color: var(--color-rose);
-  font-style: italic;
-}
+/* ---------------- Events extras: dress code ---------------- */
 .dresscode {
   max-width: 560px;
   margin: 30px auto 0;
@@ -779,8 +1024,8 @@ body.locked { overflow: hidden; height: 100vh; }
 .guestbook-form input,
 .guestbook-form textarea {
   padding: 12px 14px;
-  border: 1px solid rgba(255,255,255,0.25);
-  border-radius: 10px;
+  border: 1px solid var(--border-navy);
+  border-radius: var(--radius-sm);
   font-family: var(--font-body);
   font-size: 0.92rem;
   background: rgba(255,255,255,0.92);
@@ -790,16 +1035,18 @@ body.locked { overflow: hidden; height: 100vh; }
 .guestbook-form input:focus,
 .guestbook-form textarea:focus { outline: none; border-color: #fff; }
 .guestbook-form .btn-outline { align-self: center; }
+/* Mỗi lời chúc 1 dòng, xếp dọc — cố định 1 cột (không dùng @media vì chiều rộng
+   trình duyệt thật không khớp với khung thiệp đã giới hạn còn --shell-max). */
 .guestbook-wall {
-  max-width: 640px;
+  max-width: 480px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
 .wish-card {
   background: rgba(255,255,255,0.92);
-  border-radius: 14px;
+  border-radius: var(--radius);
   padding: 16px 18px;
   animation: wishPop 0.4s ease;
 }
@@ -815,12 +1062,11 @@ body.locked { overflow: hidden; height: 100vh; }
   font-size: 0.78rem;
   color: #c7d0e2;
 }
-@media (max-width: 640px) { .guestbook-wall { grid-template-columns: 1fr; } }
 
 /* ---------------- Footer (đóng bằng khối tối + chữ script "Thank You") ---------------- */
 .footer {
   text-align: center;
-  padding: 90px 6vw 60px;
+  padding: 56px 6% 40px;
   max-width: none;
   background: linear-gradient(180deg, #263a58 0%, #1c2b44 100%);
   color: #d7deec;
@@ -844,7 +1090,7 @@ body.locked { overflow: hidden; height: 100vh; }
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.3);
+  border: 1px solid var(--border-navy);
   display: flex;
   align-items: center;
   justify-content: center;

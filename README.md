@@ -48,6 +48,13 @@ Mở `index.html` bằng Notepad / VS Code, tìm và sửa các đoạn sau:
 - Dress code: sửa dòng gợi ý màu trang phục trong `<section id="events">`,
   đoạn có class `dresscode`.
 - Thông tin hai gia đình: sửa tên bố mẹ hai bên trong `<section id="family">`.
+- Ảnh chân dung cô dâu/chú rể (giao diện đã chuẩn bị sẵn khung ảnh, chỉ cần
+  thêm đúng tên file vào `assets/img/`, không cần sửa HTML/CSS):
+  - `chu-re.jpg`, `co-dau.jpg` — ảnh trong khung polaroid ở phần "Hai gia đình".
+  - `chu-re-avatar.jpg`, `co-dau-avatar.jpg` — ảnh vòng tròn nhỏ ở nút chọn
+    "Bạn là khách mời của" trong phần RSVP.
+  Chưa có ảnh cũng không sao — thiệp tự hiển thị khung màu + chữ thay thế cho
+  đến khi bạn thêm ảnh vào đúng tên file trên.
 - Số tài khoản mừng cưới & mã QR: sửa trong phần `<section id="gift">` của
   `index.html`. Mỗi nút "Xem mã QR chuyển khoản" có 4 thuộc tính cần sửa đúng
   thông tin thật:

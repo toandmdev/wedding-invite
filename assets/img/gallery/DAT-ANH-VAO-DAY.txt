@@ -1,0 +1,2 @@
+Đặt ảnh cho Album ảnh cưới vào đây (sẽ cập nhật index.html để hiển thị các
+ảnh này khi mình chỉnh tới phần Album).
