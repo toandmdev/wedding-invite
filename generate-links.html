@@ -26,7 +26,7 @@
     margin-bottom: 24px;
   }
   label { font-weight: 600; display: block; margin-bottom: 8px; }
-  textarea, input {
+  textarea, input, select {
     width: 100%;
     padding: 12px;
     border-radius: 10px;
@@ -63,56 +63,37 @@
 </head>
 <body>
   <h1>🔗 Công cụ tạo link riêng cho khách mời</h1>
-  <p class="sub">Dán danh sách tên khách (mỗi tên 1 dòng) để tạo link thiệp cá nhân hoá — không cần server, chạy hoàn toàn trên trình duyệt. Mẹo: thêm dấu <code>+</code> ở cuối tên (vd "Thanh Toàn +") nếu muốn mời kèm người thân, thiệp sẽ tự hiển thị "... và người thân".</p>
+  <p class="sub">Chọn bên + điền giờ Tiệc Chung Vui, dán danh sách tên khách (mỗi tên 1 dòng) để tạo link thiệp cá nhân hoá — không cần server, chạy hoàn toàn trên trình duyệt. Mẹo: thêm dấu <code>+</code> ở cuối tên (vd "Thanh Toàn +") nếu muốn mời kèm người thân, thiệp sẽ tự hiển thị "... và người thân".</p>
 
   <div class="box">
     <label for="baseUrl">Địa chỉ website thiệp cưới của bạn (sau khi deploy)</label>
-    <input id="baseUrl" type="text" placeholder="https://ten-cua-ban.vercel.app" value="https://ten-cua-ban.vercel.app" />
-    <br/><br/>
-    <label for="names">Danh sách khách mời (mỗi tên một dòng)</label>
+    <input id="baseUrl" type="text" placeholder="https://manhtoan-thanhkim-wedding.vercel.app" value="https://manhtoan-thanhkim-wedding.vercel.app" />
+
+    <label for="benSelect" style="margin-top:20px;">Tạo thiệp cho bên nào?</label>
+    <select id="benSelect">
+      <option value="gai">🌿 Nhà Gái — Tiệc Chung Vui + Lễ Vu Quy (8:00, 25/10/2026, cố định)</option>
+      <option value="trai">🥂 Nhà Trai — Tiệc Chung Vui + Lễ Thành Hôn (9:30, 25/10/2026, cố định)</option>
+    </select>
+    <p class="note" style="margin-top:-4px;">Giờ &amp; địa chỉ buổi lễ + Tiệc Chung Vui (tư gia) đã gắn sẵn cố định trong trang theo từng bên, không cần nhập lại ở đây nữa.</p>
+
+    <label for="tiecNgayGio" style="margin-top:20px;">🥂 Tiệc Chung Vui — giờ &amp; ngày (đợt khách này)</label>
+    <input id="tiecNgayGio" type="datetime-local" value="2026-10-25T11:00" />
+    <p class="note" style="margin-top:-4px;">Giờ Tiệc Chung Vui có thể khác nhau theo từng đợt khách (khác bàn/khác ca) nên vẫn cần điền ở đây — điền 1 lần cho cả danh sách bên dưới, khách nào cùng giờ thì tạo chung 1 lần.</p>
+
+    <label for="names" style="margin-top:20px;">Danh sách khách mời (mỗi tên một dòng)</label>
     <textarea id="names" placeholder="Nguyễn Văn A&#10;Trần Thị B&#10;Gia đình Cô Chú C">Nguyễn Văn A
 Trần Thị B
 Gia đình Cô Chú C</textarea>
     <br/>
     <button id="genBtn">Tạo link</button>
-    <p class="note">Mẹo: bạn cũng có thể import danh sách từ file <code>guests.csv</code> đi kèm — mở file đó bằng Excel/Google Sheets, thêm/sửa tên rồi copy cột "Họ tên" dán vào ô trên.</p>
-  </div>
-
-  <div class="box">
-    <label>⏰ Cài đặt ngày giờ &amp; địa điểm (không cần sửa code)</label>
-    <p class="note" style="margin-top:-4px;">Danh sách khách ở ô trên là của <strong>một bên</strong> (nhà trai hoặc nhà gái). Chọn đúng bên, điền giờ Tiệc Chung Vui + giờ buổi lễ của bên đó — vì nhiều khách thường mời cùng giờ, bạn chỉ cần điền 1 lần ở đây rồi bấm "Tạo link" là toàn bộ danh sách phía trên đều có đúng giờ này, không phải nhập lại cho từng khách. Muốn tạo cho bên còn lại: đổi lựa chọn bên dưới, dán danh sách khách của bên đó, điền lại giờ rồi bấm "Tạo link" lần nữa.</p>
-
-    <label for="benSelect" style="margin-top:14px;">Tạo thiệp cho bên nào?</label>
-    <select id="benSelect">
-      <option value="gai">🌿 Nhà Gái — Tiệc Chung Vui + Lễ Vu Quy</option>
-      <option value="trai">🥂 Nhà Trai — Tiệc Chung Vui + Lễ Thành Hôn</option>
-    </select>
-
-    <label for="tiecNgayGio" style="margin-top:20px;">🥂 Tiệc Chung Vui — giờ &amp; ngày</label>
-    <input id="tiecNgayGio" type="datetime-local" value="2026-10-25T11:00" />
-
-    <label for="tiecDiaDiem" style="margin-top:14px;">🥂 Tiệc Chung Vui — địa điểm (Enter để xuống dòng)</label>
-    <textarea id="tiecDiaDiem" style="min-height:70px;" placeholder="VD: Trung tâm Hội nghị Riverside&#10;Số 88, đường Nguyễn Huệ, Q.1, TP.HCM"></textarea>
-
-    <label for="tiecMap" style="margin-top:14px;">🥂 Tiệc Chung Vui — link Google Maps (nút "Chỉ đường")</label>
-    <input id="tiecMap" type="text" placeholder="https://maps.google.com/?q=..." />
-
-    <label for="leNgayGio" style="margin-top:20px;" id="leNgayGioLabel">🌿 Lễ Vu Quy — giờ &amp; ngày</label>
-    <input id="leNgayGio" type="datetime-local" value="2026-10-25T08:00" />
-
-    <label for="leDiaDiem" style="margin-top:14px;" id="leDiaDiemLabel">🌿 Lễ Vu Quy — địa điểm (Enter để xuống dòng)</label>
-    <textarea id="leDiaDiem" style="min-height:70px;" placeholder="VD: Tư gia nhà gái&#10;Số 12, đường Hoa Mai, Q. Bình Thạnh, TP.HCM"></textarea>
-
-    <label for="leMap" style="margin-top:14px;" id="leMapLabel">🌿 Lễ Vu Quy — link Google Maps (nút "Chỉ đường")</label>
-    <input id="leMap" type="text" placeholder="https://maps.google.com/?q=..." />
-
     <button id="previewBtn" type="button" style="background:transparent; border:1px solid var(--primary); color:var(--primary);">👀 Xem thử thiệp với thông tin này</button>
+    <p class="note">Mẹo: bạn cũng có thể import danh sách từ file <code>guests.csv</code> đi kèm — mở file đó bằng Excel/Google Sheets, thêm/sửa tên rồi copy cột "Họ tên" dán vào ô trên.</p>
   </div>
 
   <div class="box">
     <label>Kết quả</label>
     <table id="resultTable">
-      <thead><tr><th>Khách mời</th><th>Link riêng</th><th></th></tr></thead>
+      <thead><tr><th>Khách mời</th><th>Link riêng (đã ngắn gọn, vẫn giữ tên miền của bạn)</th><th></th></tr></thead>
       <tbody></tbody>
     </table>
     <button id="downloadBtn" style="display:none;">⬇ Tải file CSV kết quả</button>
@@ -138,65 +119,24 @@ Gia đình Cô Chú C</textarea>
     return `${VN_WEEKDAYS[jsDate.getDay()]}, ${dd}/${mm}/${y}`;
   }
 
-  // Đổi nhãn các ô "buổi lễ" theo bên đang chọn (Nhà Gái → Lễ Vu Quy,
-  // Nhà Trai → Lễ Thành Hôn) để bạn điền cho đỡ nhầm.
   const benSelect = document.getElementById("benSelect");
-  function updateLeLabels() {
-    const isTrai = benSelect.value === "trai";
-    const leLabel = isTrai ? "Lễ Thành Hôn" : "Lễ Vu Quy";
-    document.getElementById("leNgayGioLabel").textContent = `🌿 ${leLabel} — giờ & ngày`;
-    document.getElementById("leDiaDiemLabel").textContent = `🌿 ${leLabel} — địa điểm (Enter để xuống dòng)`;
-    document.getElementById("leMapLabel").textContent = `🌿 ${leLabel} — link Google Maps (nút "Chỉ đường")`;
-  }
-  // Gợi ý sẵn giờ buổi lễ theo bên đang chọn (Nhà Gái: Lễ Vu Quy 8:00 —
-  // Nhà Trai: Lễ Thành Hôn 9:30), giữ nguyên ngày đang có sẵn trong ô (chỉ
-  // đổi phần giờ). Bạn vẫn có thể sửa tay nếu giờ/ngày thực tế khác.
-  function suggestTimeForSide() {
-    const suggestedTime = benSelect.value === "trai" ? "09:30" : "08:00";
-    const el = document.getElementById("leNgayGio");
-    const date = el.value.split("T")[0] || "2026-10-25";
-    el.value = `${date}T${suggestedTime}`;
-  }
-  benSelect.addEventListener("change", () => { updateLeLabels(); suggestTimeForSide(); });
-  updateLeLabels();
 
+  // Chỉ còn "ben" + "tiec_gio" (giờ Tiệc Chung Vui của đợt khách này, có thể
+  // khác nhau theo từng đợt) là cần truyền qua URL — giờ lễ, địa chỉ, tên buổi
+  // lễ đều đã gắn sẵn cố định trong trang theo từng "ben" (xem main.js), nên
+  // link sinh ra rất ngắn gọn và vẫn giữ nguyên tên miền của bạn.
   function eventParams() {
-    // Đọc các ô "Cài đặt ngày giờ & địa điểm" — ô nào trống thì bỏ qua (thiệp giữ mặc định).
     const ben = benSelect.value; // "gai" hoặc "trai"
-    const leLabel = ben === "trai" ? "Lễ Thành Hôn" : "Lễ Vu Quy";
-    const leNgayGio = document.getElementById("leNgayGio").value;
     const tiecNgayGio = document.getElementById("tiecNgayGio").value;
 
-    // Dòng hiển thị giờ = "Vào lúc " + giờ (rút từ ô datetime-local) + ngày tự
-    // định dạng, giống đúng cách trang gốc đang hiển thị — không cần bạn gõ tay ngày.
     const timeOnly = (dt) => (dt ? dt.split("T")[1] : "");
-    const leGio = leNgayGio
-      ? [`Vào lúc ${timeOnly(leNgayGio)}`, formatVNDate(leNgayGio)].filter(Boolean).join("<br/>")
-      : "";
     const tiecGio = tiecNgayGio
       ? [`Vào lúc ${timeOnly(tiecNgayGio)}`, formatVNDate(tiecNgayGio)].filter(Boolean).join("<br/>")
       : "";
 
-    const fields = {
-      ben,
-      le_label: leLabel,
-      le_gio: leGio,
-      le_diadiem: document.getElementById("leDiaDiem").value.trim(),
-      le_map: document.getElementById("leMap").value.trim(),
-      tiec_gio: tiecGio,
-      tiec_diadiem: document.getElementById("tiecDiaDiem").value.trim(),
-      tiec_map: document.getElementById("tiecMap").value.trim(),
-    };
     const params = new URLSearchParams();
-    Object.entries(fields).forEach(([k, v]) => { if (v) params.set(k, v); });
-
-    // Giờ buổi lễ quyết định phần đếm ngược + Âm lịch ở đầu thiệp.
-    if (leNgayGio) {
-      // <input type="datetime-local"> trả về giờ theo múi giờ máy tính của bạn;
-      // ta gắn thêm "+07:00" để trang luôn hiểu đúng là giờ Việt Nam dù khách
-      // mở link từ nước ngoài.
-      params.set("ngay", `${leNgayGio}:00+07:00`);
-    }
+    params.set("ben", ben);
+    if (tiecGio) params.set("tiec_gio", tiecGio);
     return params;
   }
 
@@ -208,14 +148,14 @@ Gia đình Cô Chú C</textarea>
   }
 
   document.getElementById("previewBtn").addEventListener("click", () => {
-    const base = (document.getElementById("baseUrl").value || "https://ten-cua-ban.vercel.app").trim().replace(/\/$/, "");
+    const base = (document.getElementById("baseUrl").value || "https://manhtoan-thanhkim-wedding.vercel.app").trim().replace(/\/$/, "");
     const params = eventParams();
     params.set("to", "Xem thử");
     window.open(`${base}/?${params.toString()}`, "_blank", "noopener");
   });
 
   genBtn.addEventListener("click", () => {
-    const base = document.getElementById("baseUrl").value || "https://ten-cua-ban.vercel.app";
+    const base = document.getElementById("baseUrl").value || "https://manhtoan-thanhkim-wedding.vercel.app";
     const names = document.getElementById("names").value
       .split("\n")
       .map(n => n.trim())

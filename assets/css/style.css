@@ -350,7 +350,7 @@ body.locked { overflow: hidden; height: 100vh; }
 /* Lịch tháng đánh dấu ngày cưới, giờ hiển thị ngay dưới hero-date */
 .hero-info .wedding-calendar { margin: 26px auto 30px; }
 
-.guest-line { font-size: 1.2rem; color: var(--color-ink-soft); margin: 0 0 30px; }
+.guest-line { font-size: 1rem; color: var(--color-ink-soft); margin: 0 0 30px; }
 .guest-line strong { color: var(--color-navy-dark); border-bottom: 1px solid var(--color-line); padding-bottom: 1px; }
 
 /* Tên chú rể / cô dâu — thay cho phần tiêu đề từng bị lặp lại ở khối "Hai gia đình".
@@ -672,6 +672,7 @@ body.locked { overflow: hidden; height: 100vh; }
   color: var(--color-navy);
 }
 .event-icon svg { width: 100%; height: 100%; }
+.event-icon img { width: 100%; height: 100%; object-fit: contain; }
 .event-card h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.5rem; margin: 0 0 10px; color: var(--color-navy-dark); }
 /* Chữ số (giờ/ngày) dùng font hệ thống thay vì font chữ đang dùng cho phần còn lại
    của card — một số kiểu chữ trang trí hiển thị số "1" trông lạ/lỗi ở cỡ nhỏ, nên

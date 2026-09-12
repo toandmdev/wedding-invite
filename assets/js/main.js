@@ -29,6 +29,12 @@
 
   const guestCode = new URLSearchParams(window.location.search).get("khachmoi");
 
+  // Bên đang xem thiệp — dùng chung cho cả địa chỉ tư gia, tên buổi lễ, giờ lễ
+  // mặc định và ngày đếm ngược/Âm lịch bên dưới, để link khách mời chỉ cần
+  // mang theo "?ben=trai|gai&to=Tên" là đủ, không phải nhét giờ/địa chỉ vào
+  // từng link nữa.
+  const ben = (new URLSearchParams(window.location.search).get("ben") || "gai").toLowerCase();
+
   const guestName = getGuestName();
   const fallbackName = "Quý khách";
   const displayName = guestName || fallbackName;
@@ -78,6 +84,15 @@
     map: "https://maps.app.goo.gl/Xgu69FonJWdBbjfi9",
   };
 
+  // Giờ buổi lễ cố định theo từng bên (Lễ Thành Hôn nhà trai 9h30, Lễ Vu Quy
+  // nhà gái 8h00, cùng ngày 25/10/2026) — khác với Tiệc Chung Vui (giờ có thể
+  // đổi theo từng đợt khách nên vẫn dùng ?tiec_gio=... như trước), giờ lễ là
+  // cố định nên gắn thẳng vào đây, khỏi phải lặp lại trong từng link khách mời.
+  const EVENT_LE = {
+    trai: { time: "Vào lúc 9:30<br/>Chủ nhật, 25/10/2026", isoDate: "2026-10-25T09:30:00+07:00" },
+    gai: { time: "Vào lúc 8:00<br/>Chủ nhật, 25/10/2026", isoDate: "2026-10-25T08:00:00+07:00" },
+  };
+
   (function applyEventOverrides() {
     const p = new URLSearchParams(window.location.search);
     const setText = (id, key) => {
@@ -101,7 +116,6 @@
       if (linkEl) linkEl.href = home.map;
     };
 
-    const ben = (p.get("ben") || "gai").toLowerCase();
     const home = ben === "trai" ? HOME_TRAI : HOME_GAI;
 
     // Mặc định: cả Tiệc Chung Vui và buổi lễ đều ở tư gia của đúng "ben" —
@@ -113,6 +127,12 @@
     const defaultLeLabel = ben === "trai" ? "Lễ Thành Hôn" : "Lễ Vu Quy";
     const leLabelEl = document.getElementById("eventLeLabel");
     if (leLabelEl) leLabelEl.textContent = p.get("le_label") || defaultLeLabel;
+
+    // Giờ lễ mặc định theo bên (9h30 nhà trai / 8h00 nhà gái) — vẫn cho phép
+    // ?le_gio=... ghi đè riêng nếu một khách/đợt nào đó cần giờ khác.
+    const leInfo = EVENT_LE[ben] || EVENT_LE.gai;
+    const leTimeEl = document.getElementById("eventLeTime");
+    if (leTimeEl) leTimeEl.innerHTML = leInfo.time;
 
     setText("eventLeTime", "le_gio");
     setText("eventLePlace", "le_diadiem");
@@ -224,7 +244,9 @@
      tham số `?ngay=2026-10-25T09:00:00+07:00` để trang tự đếm ngược / tính
      Âm lịch đúng theo ngày của bên đó — không cần sửa file này.
   --------------------------------------------------- */
-  const DEFAULT_WEDDING_DATE = new Date("2026-10-25T08:00:00+07:00");
+  // Mặc định lấy theo giờ lễ cố định của đúng "ben" (xem EVENT_LE ở trên) —
+  // ?ngay=... vẫn ghi đè được nếu cần chỉnh riêng cho một link cụ thể.
+  const DEFAULT_WEDDING_DATE = new Date((EVENT_LE[ben] || EVENT_LE.gai).isoDate);
   const ngayParam = new URLSearchParams(window.location.search).get("ngay");
   const parsedNgay = ngayParam ? new Date(ngayParam) : null;
   const WEDDING_DATE = (parsedNgay && !isNaN(parsedNgay.getTime())) ? parsedNgay : DEFAULT_WEDDING_DATE;
