@@ -1,0 +1,85 @@
+HƯỚNG DẪN NỐI FORM "XÁC NHẬN THAM DỰ" (RSVP) VỚI GOOGLE SHEET
+================================================================
+Miễn phí hoàn toàn, không cần server riêng — dùng Google Apps Script (có sẵn
+trong mọi tài khoản Google) làm cầu nối giữa form trên thiệp và Google Sheet.
+
+BƯỚC 1 — Tạo Google Sheet
+--------------------------
+1. Vào https://sheets.google.com, tạo 1 Sheet mới, đặt tên tuỳ ý (vd "RSVP đám cưới").
+2. Không cần tạo cột/tiêu đề gì trước — script bên dưới sẽ tự tạo tab "RSVP"
+   và dòng tiêu đề khi có phản hồi đầu tiên.
+
+BƯỚC 2 — Thêm Google Apps Script
+----------------------------------
+1. Trong Sheet vừa tạo, vào menu Tiện ích mở rộng (Extensions) → Apps Script.
+2. Xoá hết code mẫu (myFunction() rỗng), dán đoạn code bên dưới vào:
+
+-----------------------------------------------------------------
+function doPost(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("RSVP");
+  if (!sheet) {
+    sheet = ss.insertSheet("RSVP");
+    sheet.appendRow([
+      "Thời gian", "Họ tên", "SĐT", "Khách mời của",
+      "Tham dự", "Số người đi cùng", "Lời chúc", "Mã khách mời"
+    ]);
+  }
+  var data = JSON.parse(e.postData.contents);
+  sheet.appendRow([
+    new Date(),
+    data.name || "",
+    data.phone || "",
+    data.side || "",
+    data.attend || "",
+    data.guests || "",
+    data.message || "",
+    data.khachmoi || "",
+  ]);
+  return ContentService
+    .createTextOutput(JSON.stringify({ result: "success" }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+-----------------------------------------------------------------
+
+3. Bấm biểu tượng 💾 (Lưu dự án) — đặt tên dự án tuỳ ý, vd "RSVP Wedding".
+
+BƯỚC 3 — Deploy thành Web App
+-------------------------------
+1. Góc trên bên phải, bấm nút xanh "Deploy" (Triển khai) → "New deployment"
+   (Triển khai mới).
+2. Bấm biểu tượng ⚙️ cạnh "Select type" → chọn "Web app".
+3. Điền:
+   - Description: tuỳ ý (vd "RSVP endpoint")
+   - Execute as (Thực thi với tư cách): Me (tài khoản của bạn)
+   - Who has access (Ai có quyền truy cập): Anyone (Bất kỳ ai)
+     ⚠️ Bắt buộc chọn "Anyone" — nếu để "Only myself" thì thiệp sẽ không
+     gửi được dữ liệu vì khách không đăng nhập Google.
+4. Bấm "Deploy". Lần đầu Google sẽ yêu cầu bạn cấp quyền (Authorize access)
+   — chọn tài khoản Google của bạn, bấm "Advanced" → "Go to (tên dự án) (unsafe)"
+   nếu thấy cảnh báo (đây là dự án của chính bạn nên an toàn) → Allow.
+5. Sau khi deploy xong, copy "Web app URL" — có dạng:
+   https://script.google.com/macros/s/AKfycb..................../exec
+
+BƯỚC 4 — Gắn URL vào thiệp
+----------------------------
+Mở file assets/js/main.js, tìm dòng:
+
+    const RSVP_ENDPOINT = ""; // vd: "https://script.google.com/macros/s/XXXXXXXX/exec"
+
+Dán URL vừa copy vào giữa 2 dấu ngoặc kép, ví dụ:
+
+    const RSVP_ENDPOINT = "https://script.google.com/macros/s/AKfycb..../exec";
+
+Lưu file, deploy lại lên Vercel (git push) — vậy là xong! Từ giờ mỗi khách
+bấm "Gửi xác nhận" trên thiệp, phản hồi của họ sẽ tự động thành 1 dòng mới
+trong tab "RSVP" của Google Sheet bạn tạo ở Bước 1.
+
+LƯU Ý
+------
+- Nếu sau này bạn sửa lại code trong Apps Script, phải bấm lại Deploy →
+  "Manage deployments" → biểu tượng ✏️ → chọn version mới → Deploy thì thay
+  đổi mới có hiệu lực (sửa code không tự áp dụng vào Web App đang chạy).
+- Muốn nối luôn phần "Sổ lưu bút" (lời chúc) để mọi khách thấy lời chúc thật
+  của nhau, báo tôi — cách làm tương tự (tạo thêm 1 hàm doPost / 1 sheet
+  riêng cho lời chúc), tôi sẽ code sẵn giúp bạn.

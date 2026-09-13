@@ -143,12 +143,13 @@
       <div class="gallery-item gallery-e reveal" data-idx="4"><img src="assets/img/gallery/5.JPG" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
       <div class="gallery-item gallery-f reveal" data-idx="5"><img src="assets/img/gallery/6.JPG" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
     </div>
-    <!-- 4 ảnh còn lại: lưới vuông đơn giản, chỉ hiện khi bấm "Xem thêm ảnh" -->
+    <!-- 4 ảnh còn lại: bố cục bento khác biến thể (1 ảnh vuông lớn + 1 ảnh dọc + 2 ảnh nhỏ),
+         chỉ hiện khi bấm "Xem thêm ảnh" -->
     <div class="gallery-grid gallery-grid--extra" id="galleryExtraGrid">
-      <div class="gallery-item reveal" data-idx="6"><img src="assets/img/gallery/7.jpg" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
-      <div class="gallery-item reveal" data-idx="7"><img src="assets/img/gallery/8.jpg" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
-      <div class="gallery-item reveal" data-idx="8"><img src="assets/img/gallery/9.jpg" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
-      <div class="gallery-item reveal" data-idx="9"><img src="assets/img/gallery/91.jpg" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
+      <div class="gallery-item gallery-g reveal" data-idx="6"><img src="assets/img/gallery/7.jpg" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
+      <div class="gallery-item gallery-h reveal" data-idx="7"><img src="assets/img/gallery/8.jpg" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
+      <div class="gallery-item gallery-i reveal" data-idx="8"><img src="assets/img/gallery/9.jpg" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
+      <div class="gallery-item gallery-j reveal" data-idx="9"><img src="assets/img/gallery/91.jpg" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
     </div>
     <div class="gallery-more-wrap reveal" id="galleryMoreWrap">
       <button type="button" class="btn-outline sm" id="galleryMoreBtn">Xem thêm ảnh</button>
@@ -181,7 +182,6 @@
       <button type="submit" class="btn-outline on-navy sm">Gửi lời chúc</button>
     </form>
     <div id="guestbookWall" class="guestbook-wall"></div>
-    <p class="guestbook-note reveal">*Bản demo: lời chúc chỉ hiển thị tạm trên máy bạn (mất khi tải lại trang). Xem README để nối vào Google Sheet, hiển thị lời chúc thật của mọi khách mời cho tất cả cùng xem.</p>
   </section>
 
   <!-- ============ RSVP (tiếp tục nền navy) ============ -->
@@ -232,7 +232,6 @@
         <textarea id="rsvpMsg" name="message" rows="3" placeholder="Gửi lời chúc mừng tới cô dâu chú rể..."></textarea>
       </div>
       <button type="submit" class="btn-solid">Gửi xác nhận</button>
-      <p class="form-note">*Đây là bản demo: form đang gửi qua email mặc định của trình duyệt. Xem README để nối với Google Form / Google Sheet miễn phí.</p>
     </form>
     <div id="rsvpThanks" class="rsvp-thanks" hidden>
       <p>💛 Cảm ơn <strong id="rsvpThanksName">bạn</strong> đã phản hồi! Hẹn gặp trong ngày trọng đại.</p>
@@ -253,27 +252,27 @@
       <p class="section-script center on-navy">Hộp Mừng Cưới</p>
       <p class="gift-sub">Sự hiện diện của bạn là món quà quý giá nhất. Nếu muốn gửi lời chúc kèm quà mừng, bạn có thể quét mã QR bên dưới bằng app ngân hàng / ví điện tử hỗ trợ VietQR, hoặc copy số tài khoản.</p>
       <div class="gift-cards">
-        <div class="gift-card" data-bin="970436" data-account="0123456789" data-name="DINH MANH TOAN" data-purpose="Mung cuoi Dinh Manh Toan">
+        <div class="gift-card" data-bin="970432" data-account="0972877929" data-name="DINH MANH TOAN" data-purpose="Mung cuoi Dinh Manh Toan">
           <h3>Chú Rể — Mạnh Toản</h3>
-          <p>Ngân hàng Vietcombank</p>
-          <p class="acc">STK: 0123456789</p>
+          <p>Ngân hàng VPBank</p>
+          <p class="acc">STK: 0972877929</p>
           <div class="qr-panel">
             <div class="qr-box"><img alt="Mã QR chuyển khoản cho Chú Rể" /></div>
             <div class="qr-actions">
               <button class="btn-copy btn-download" type="button" data-download data-download-name="qr-chu-re-manh-toan.png">⬇ Tải ảnh QR</button>
-              <button class="btn-copy" type="button" data-copy="0123456789">📋 Copy số tài khoản</button>
+              <button class="btn-copy" type="button" data-copy="0972877929">📋 Copy số tài khoản</button>
             </div>
           </div>
         </div>
-        <div class="gift-card" data-bin="970407" data-account="9876543210" data-name="LE THI THANH KIM" data-purpose="Mung cuoi Le Thi Thanh Kim">
+        <div class="gift-card" data-bin="970415" data-account="109872740089" data-name="LE THI THANH KIM" data-purpose="Mung cuoi Le Thi Thanh Kim">
           <h3>Cô Dâu — Thanh Kim</h3>
-          <p>Ngân hàng Techcombank</p>
-          <p class="acc">STK: 9876543210</p>
+          <p>Ngân hàng VietinBank</p>
+          <p class="acc">STK: 109872740089</p>
           <div class="qr-panel">
             <div class="qr-box"><img alt="Mã QR chuyển khoản cho Cô Dâu" /></div>
             <div class="qr-actions">
               <button class="btn-copy btn-download" type="button" data-download data-download-name="qr-co-dau-thanh-kim.png">⬇ Tải ảnh QR</button>
-              <button class="btn-copy" type="button" data-copy="9876543210">📋 Copy số tài khoản</button>
+              <button class="btn-copy" type="button" data-copy="109872740089">📋 Copy số tài khoản</button>
             </div>
           </div>
         </div>

@@ -84,12 +84,12 @@
     map: "https://maps.app.goo.gl/Xgu69FonJWdBbjfi9",
   };
 
-  // Giờ buổi lễ cố định theo từng bên (Lễ Thành Hôn nhà trai 9h30, Lễ Vu Quy
+  // Giờ buổi lễ cố định theo từng bên (Lễ Thành Hôn nhà trai 10h00, Lễ Vu Quy
   // nhà gái 8h00, cùng ngày 25/10/2026) — khác với Tiệc Chung Vui (giờ có thể
   // đổi theo từng đợt khách nên vẫn dùng ?tiec_gio=... như trước), giờ lễ là
   // cố định nên gắn thẳng vào đây, khỏi phải lặp lại trong từng link khách mời.
   const EVENT_LE = {
-    trai: { time: "Vào lúc 9:30<br/>Chủ nhật, 25/10/2026", isoDate: "2026-10-25T09:30:00+07:00" },
+    trai: { time: "Vào lúc 10:00<br/>Chủ nhật, 25/10/2026", isoDate: "2026-10-25T10:00:00+07:00" },
     gai: { time: "Vào lúc 8:00<br/>Chủ nhật, 25/10/2026", isoDate: "2026-10-25T08:00:00+07:00" },
   };
 
@@ -128,7 +128,7 @@
     const leLabelEl = document.getElementById("eventLeLabel");
     if (leLabelEl) leLabelEl.textContent = p.get("le_label") || defaultLeLabel;
 
-    // Giờ lễ mặc định theo bên (9h30 nhà trai / 8h00 nhà gái) — vẫn cho phép
+    // Giờ lễ mặc định theo bên (10h00 nhà trai / 8h00 nhà gái) — vẫn cho phép
     // ?le_gio=... ghi đè riêng nếu một khách/đợt nào đó cần giờ khác.
     const leInfo = EVENT_LE[ben] || EVENT_LE.gai;
     const leTimeEl = document.getElementById("eventLeTime");
@@ -341,7 +341,15 @@
       `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${start}/${end}&details=${details}&location=${location}`;
   }
 
-  /* ---------- 8. RSVP form (demo) ---------- */
+  /* ---------- 8. RSVP form — nối với Google Sheet qua Google Apps Script ----------
+     Dán URL Web App (kết thúc bằng "/exec") vào RSVP_ENDPOINT bên dưới sau khi
+     deploy Google Apps Script (xem file google-apps-script-rsvp.txt đi kèm để
+     lấy đoạn code + các bước deploy chi tiết). Để trống thì form vẫn hoạt động
+     bình thường (hiện lời cảm ơn) nhưng không lưu đi đâu — giống bản demo cũ.
+  --------------------------------------------------- */
+  const RSVP_ENDPOINT = ""; // vd: "https://script.google.com/macros/s/XXXXXXXX/exec"
+
+  /* ---------- 8b. RSVP form ---------- */
   // "Bạn là khách mời của" — bấm để chọn Chú Rể / Cô Dâu, lưu vào ô ẩn #rsvpSide
   const sideButtons = document.querySelectorAll(".side-btn");
   const rsvpSideInput = document.getElementById("rsvpSide");
@@ -376,20 +384,28 @@
       const name = data.get("name") || displayName;
       const sideLabel = data.get("side") === "bride" ? "Cô Dâu" : "Chú Rể";
 
-      // DEMO: mở email mặc định với nội dung phản hồi.
-      // Khi triển khai thật, hãy thay đoạn này bằng fetch() gửi tới
-      // Google Form / Google Sheet / một API RSVP (xem README.md).
-      const subject = encodeURIComponent(`RSVP - ${name}`);
-      const bodyLines = [
-        `Họ tên: ${name}`,
-        `SĐT: ${data.get("phone") || ""}`,
-        `Khách mời của: ${sideLabel}`,
-        `Tham dự: ${data.get("attend")}`,
-        `Số người đi cùng: ${data.get("guests") || 0}`,
-        `Lời chúc: ${data.get("message") || ""}`,
-      ];
-      const body = encodeURIComponent(bodyLines.join("\n"));
-      // window.location.href = `mailto:your-email@example.com?subject=${subject}&body=${body}`;
+      if (RSVP_ENDPOINT) {
+        const payload = {
+          name,
+          phone: data.get("phone") || "",
+          side: sideLabel,
+          attend: data.get("attend") || "",
+          guests: data.get("guests") || 0,
+          message: data.get("message") || "",
+          khachmoi: guestCode || "",
+        };
+        // Google Apps Script Web App không trả về header CORS đọc được từ trình
+        // duyệt, nên dùng mode "no-cors" — không đọc được kết quả trả về, nhưng
+        // dữ liệu vẫn được ghi vào Google Sheet phía server bình thường.
+        fetch(RSVP_ENDPOINT, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload),
+        }).catch(() => {
+          /* Lỗi mạng cũng không chặn trải nghiệm khách — vẫn hiện lời cảm ơn bên dưới. */
+        });
+      }
 
       document.getElementById("rsvpThanksName").textContent = name;
       rsvpForm.hidden = true;
@@ -526,16 +542,13 @@
   renderLunarDate();
 
   /* ---------- 12. Sổ lưu bút (Guestbook) ----------
-     Bản demo: lời chúc được lưu tạm trong bộ nhớ trình duyệt của người
-     xem (mất khi tải lại trang) — không có backend nên chưa hiển thị
-     lời chúc thật của các khách khác cho nhau xem. Xem README mục
-     "Sổ lưu bút" để nối vào Google Sheet cho lời chúc lưu thật & công khai.
+     Sổ để trống lúc mới tải trang — chỉ hiện lời chúc thật khi khách tự nhập
+     và bấm "Gửi lời chúc" (không còn 2 lời chúc mẫu như bản demo trước đây).
+     Lưu ý: lời chúc hiện vẫn chỉ hiển thị tạm trong trình duyệt của đúng
+     người vừa gửi (mất khi họ tải lại trang) — chưa có backend nên các khách
+     khác không thấy lời chúc của nhau. Muốn mọi khách cùng thấy lời chúc thật
+     của nhau, cần nối vào Google Sheet tương tự cách làm với RSVP bên dưới.
   --------------------------------------------------- */
-  const SAMPLE_WISHES = [
-    { name: "Gia đình hai bên", message: "Chúc hai con trăm năm hạnh phúc, sớm có tin vui!" },
-    { name: "Hải & Linh", message: "Chúc Mạnh Toản và Thanh Kim mãi yêu thương như ngày đầu 💕" },
-  ];
-
   function renderWishCard(wish) {
     const wall = document.getElementById("guestbookWall");
     if (!wall) return;
@@ -546,8 +559,6 @@
     card.innerHTML = `<p class="wish-msg">${safeMsg}</p><p class="wish-name">— ${safeName}</p>`;
     wall.prepend(card);
   }
-
-  SAMPLE_WISHES.forEach(renderWishCard);
 
   const guestbookForm = document.getElementById("guestbookForm");
   if (guestbookForm) {

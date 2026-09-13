@@ -284,7 +284,10 @@ body.locked { overflow: hidden; height: 100vh; }
   height: 100%;
   object-fit: cover;
   object-position: top center;
+  transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
 }
+/* Rê chuột vào ảnh cưới: phóng nhẹ ảnh, tạo cảm giác sống động (chỉ rõ trên desktop) */
+.hero-photo:hover img { transform: scale(1.045); }
 .hero-photo-fallback {
   position: absolute;
   inset: 0;
@@ -316,7 +319,17 @@ body.locked { overflow: hidden; height: 100vh; }
   line-height: 1.05;
   text-shadow: 0 10px 34px rgba(0,0,0,0.4), 0 2px 10px rgba(0,0,0,0.3);
 }
-.hero-name { font-size: clamp(3rem, 15vw, 5.6rem); }
+.hero-name {
+  font-size: clamp(3rem, 15vw, 5.6rem);
+  display: inline-block;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), text-shadow 0.5s ease;
+}
+/* Rê chuột (hoặc chạm giữ trên điện thoại) vào tên cô dâu/chú rể trên ảnh: nổi bật hơn hẳn */
+.hero-name:hover,
+.hero-name:active {
+  transform: scale(1.1) translateY(-3px);
+  text-shadow: 0 0 30px rgba(255,255,255,0.65), 0 10px 34px rgba(0,0,0,0.4), 0 2px 10px rgba(0,0,0,0.3);
+}
 .hero-amp { font-size: clamp(2.1rem, 10vw, 3.8rem); margin: -0.08em 0; color: #eef2f8; }
 
 /* Khối thông tin nền ivory bên dưới ảnh */
@@ -337,7 +350,10 @@ body.locked { overflow: hidden; height: 100vh; }
   font-size: clamp(2.6rem, 9vw, 3.6rem);
   color: var(--color-navy);
   margin: 0 0 8px;
+  display: inline-block;
+  transition: color 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
+.hero-savedate:hover { color: var(--color-rose); transform: scale(1.04); }
 .hero-date {
   font-family: var(--font-display);
   font-weight: 600;
@@ -366,7 +382,18 @@ body.locked { overflow: hidden; height: 100vh; }
   color: var(--color-navy-dark);
   line-height: 1.05;
 }
-.hero-couple-name { font-size: clamp(2.6rem, 13vw, 4.6rem); }
+.hero-couple-name {
+  font-size: clamp(2.6rem, 13vw, 4.6rem);
+  display: inline-block;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), color 0.5s ease, text-shadow 0.5s ease;
+}
+/* Rê chuột (hoặc chạm giữ trên điện thoại) vào tên trên nền ivory: nổi lên + ánh vàng nhẹ */
+.hero-couple-name:hover,
+.hero-couple-name:active {
+  transform: scale(1.1) translateY(-3px);
+  color: var(--color-rose);
+  text-shadow: 0 8px 22px rgba(198,148,90,0.28);
+}
 .hero-couple-amp { font-size: clamp(1.9rem, 9vw, 3.2rem); margin: -0.08em 0; color: var(--color-rose); }
 
 /* ---------------- Story / timeline ---------------- */
@@ -506,22 +533,29 @@ body.locked { overflow: hidden; height: 100vh; }
 }
 .gallery-item:hover { transform: scale(1.03); z-index: 1; }
 
-/* Lưới ảnh "xem thêm": 3 cột vuông đều nhau, ẩn mặc định */
+/* Lưới ảnh "xem thêm": bố cục bento khác biến thể — 1 ảnh vuông lớn + 1 ảnh dọc +
+   2 ảnh vuông nhỏ xếp cột, thay cho lưới 3 cột đều nhau trước đây để đỡ đơn điệu. */
 .gallery-grid--extra {
   display: none;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: none;
-  grid-template-areas: none;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 100px);
+  grid-template-areas:
+    "g g h i"
+    "g g h j";
+  gap: 8px;
   margin-top: 8px;
 }
 .gallery-grid--extra.is-visible { display: grid; }
-.gallery-grid--extra .gallery-item { aspect-ratio: 1 / 1; }
+.gallery-g { grid-area: g; }
+.gallery-h { grid-area: h; }
+.gallery-i { grid-area: i; }
+.gallery-j { grid-area: j; }
 
 .gallery-more-wrap { text-align: center; margin-top: 22px; }
 .gallery-more-wrap.is-hidden { display: none; }
 @media (max-width: 420px) {
   .gallery-grid { grid-template-rows: repeat(3, 80px); gap: 6px; }
-  .gallery-grid--extra { gap: 6px; }
+  .gallery-grid--extra { grid-template-rows: repeat(2, 84px); gap: 6px; }
 }
 
 /* ---------------- Lightbox xem ảnh lớn ---------------- */
@@ -635,12 +669,26 @@ body.locked { overflow: hidden; height: 100vh; }
   background: var(--color-navy);
   color: #fff;
   font-weight: 700;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease, background 0.4s ease;
+}
+/* Rê chuột (hoặc chạm giữ trên điện thoại) vào ngày cưới: nổi bật hẳn lên như tên cô dâu/chú rể */
+.cal-day.is-wedding-day:hover,
+.cal-day.is-wedding-day:active {
+  background: var(--color-rose);
+  transform: scale(1.22);
+  box-shadow: 0 8px 20px rgba(198,148,90,0.4);
+  z-index: 1;
 }
 .cal-heart {
   position: absolute;
   top: -9px;
   font-size: 0.8rem;
   color: var(--color-rose);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cal-day.is-wedding-day:hover .cal-heart,
+.cal-day.is-wedding-day:active .cal-heart {
+  transform: scale(1.3) translateY(-2px);
 }
 
 /* ---------------- Events ---------------- */
