@@ -204,11 +204,14 @@ a { color: inherit; text-decoration: none; }
   box-shadow: 0 10px 25px -12px rgba(0,0,0,0.25);
 }
 .envelope-label {
-  margin: 0 0 4px;
-  font-size: 0.72rem;
-  letter-spacing: 0.15em;
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(0.95rem, 3.6vw, 1.15rem);
+  letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: var(--color-ink-soft);
+  color: var(--color-navy-soft);
 }
 .envelope-guest {
   margin: 0;
@@ -218,16 +221,16 @@ a { color: inherit; text-decoration: none; }
   color: var(--color-navy);
 }
 .btn-open {
-  font-family: var(--font-body);
+  font-family: var(--font-display);
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.07em;
   background: var(--color-navy);
   color: var(--color-white);
   border: none;
-  padding: 14px 30px;
+  padding: 16px 38px;
   border-radius: 999px;
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: clamp(1.05rem, 4.2vw, 1.25rem);
   transition: transform 0.3s ease, background 0.3s ease;
 }
 .btn-open:hover { background: var(--color-navy-dark); transform: translateY(-2px); }
@@ -533,29 +536,35 @@ body.locked { overflow: hidden; height: 100vh; }
 }
 .gallery-item:hover { transform: scale(1.03); z-index: 1; }
 
-/* Lưới ảnh "xem thêm": bố cục bento khác biến thể — 1 ảnh vuông lớn + 1 ảnh dọc +
-   2 ảnh vuông nhỏ xếp cột, thay cho lưới 3 cột đều nhau trước đây để đỡ đơn điệu. */
+/* Lưới ảnh "xem thêm": dùng bố cục masonry (CSS columns) thay vì grid-auto-flow: dense —
+   dense hay để lại 1-2 ảnh mồ côi lệch hẳn xuống dưới khi số ảnh không tròn nhịp (vd 7
+   ảnh), nhìn rất lộn xộn. Với columns, trình duyệt tự cân bằng chiều cao từng cột nên
+   luôn gọn gàng dù thêm/bớt bao nhiêu ảnh. Mỗi ảnh có tỉ lệ khung khác nhau (nth-child)
+   để vẫn giữ cảm giác "tự do", không đều tăm tắp như lưới vuông cũ. */
 .gallery-grid--extra {
   display: none;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(2, 100px);
-  grid-template-areas:
-    "g g h i"
-    "g g h j";
-  gap: 8px;
+  column-count: 3;
+  column-gap: 8px;
   margin-top: 8px;
 }
-.gallery-grid--extra.is-visible { display: grid; }
-.gallery-g { grid-area: g; }
-.gallery-h { grid-area: h; }
-.gallery-i { grid-area: i; }
-.gallery-j { grid-area: j; }
+.gallery-grid--extra.is-visible { display: block; }
+.gallery-grid--extra .gallery-item {
+  width: 100%;
+  margin: 0 0 8px;
+  break-inside: avoid;
+}
+.gallery-grid--extra .gallery-item:nth-child(5n+1) { aspect-ratio: 3 / 4; }
+.gallery-grid--extra .gallery-item:nth-child(5n+2) { aspect-ratio: 1 / 1; }
+.gallery-grid--extra .gallery-item:nth-child(5n+3) { aspect-ratio: 4 / 5; }
+.gallery-grid--extra .gallery-item:nth-child(5n+4) { aspect-ratio: 1 / 1; }
+.gallery-grid--extra .gallery-item:nth-child(5n+5) { aspect-ratio: 5 / 6; }
 
 .gallery-more-wrap { text-align: center; margin-top: 22px; }
 .gallery-more-wrap.is-hidden { display: none; }
 @media (max-width: 420px) {
   .gallery-grid { grid-template-rows: repeat(3, 80px); gap: 6px; }
-  .gallery-grid--extra { grid-template-rows: repeat(2, 84px); gap: 6px; }
+  .gallery-grid--extra { column-count: 2; column-gap: 6px; }
+  .gallery-grid--extra .gallery-item { margin-bottom: 6px; }
 }
 
 /* ---------------- Lightbox xem ảnh lớn ---------------- */

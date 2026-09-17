@@ -143,13 +143,20 @@
       <div class="gallery-item gallery-e reveal" data-idx="4"><img src="assets/img/gallery/5.JPG" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
       <div class="gallery-item gallery-f reveal" data-idx="5"><img src="assets/img/gallery/6.JPG" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
     </div>
-    <!-- 4 ảnh còn lại: bố cục bento khác biến thể (1 ảnh vuông lớn + 1 ảnh dọc + 2 ảnh nhỏ),
-         chỉ hiện khi bấm "Xem thêm ảnh" -->
+    <!-- Ảnh còn lại: bố cục bento tự do, tự dàn theo số lượng ảnh thực tế trong thư mục
+         (grid-auto-flow: dense trong CSS) thay vì cố định đúng 4 ô như trước — thêm/bớt
+         ảnh trong thẻ này sẽ luôn hiển thị đủ, không cần sửa lại CSS mỗi lần. Chỉ hiện
+         khi bấm "Xem thêm ảnh". LƯU Ý: tên file phải khớp CHÍNH XÁC hoa/thường với file
+         thật trong thư mục assets/img/gallery — máy chủ deploy (Vercel) phân biệt hoa
+         thường dù Windows thì không, sai hoa/thường sẽ khiến ảnh bị thiếu khi lên mạng. -->
     <div class="gallery-grid gallery-grid--extra" id="galleryExtraGrid">
-      <div class="gallery-item gallery-g reveal" data-idx="6"><img src="assets/img/gallery/7.jpg" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
-      <div class="gallery-item gallery-h reveal" data-idx="7"><img src="assets/img/gallery/8.jpg" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
-      <div class="gallery-item gallery-i reveal" data-idx="8"><img src="assets/img/gallery/9.jpg" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
-      <div class="gallery-item gallery-j reveal" data-idx="9"><img src="assets/img/gallery/91.jpg" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
+      <div class="gallery-item reveal" data-idx="6"><img src="assets/img/gallery/7.JPG" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
+      <div class="gallery-item reveal" data-idx="7"><img src="assets/img/gallery/8.JPG" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
+      <div class="gallery-item reveal" data-idx="8"><img src="assets/img/gallery/9.jpg" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
+      <div class="gallery-item reveal" data-idx="9"><img src="assets/img/gallery/91.jpg" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
+      <div class="gallery-item reveal" data-idx="10"><img src="assets/img/gallery/10.jpg" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
+      <div class="gallery-item reveal" data-idx="11"><img src="assets/img/gallery/11.jpg" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
+      <div class="gallery-item reveal" data-idx="12"><img src="assets/img/gallery/12.jpg" alt="" loading="lazy" onerror="this.style.display='none'" /></div>
     </div>
     <div class="gallery-more-wrap reveal" id="galleryMoreWrap">
       <button type="button" class="btn-outline sm" id="galleryMoreBtn">Xem thêm ảnh</button>
@@ -191,11 +198,11 @@
     <form id="rsvpForm" class="rsvp-form reveal">
       <div class="form-row">
         <label for="rsvpName">Họ và tên</label>
-        <input type="text" id="rsvpName" name="name" required placeholder="Nguyễn Văn A" />
+        <input type="text" id="rsvpName" name="name" required />
       </div>
       <div class="form-row">
         <label for="rsvpPhone">Số điện thoại</label>
-        <input type="tel" id="rsvpPhone" name="phone" placeholder="09xx xxx xxx" />
+        <input type="tel" id="rsvpPhone" name="phone" />
       </div>
       <div class="form-row">
         <label>Bạn là khách mời của</label>
