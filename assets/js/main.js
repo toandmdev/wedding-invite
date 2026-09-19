@@ -347,7 +347,7 @@
      lấy đoạn code + các bước deploy chi tiết). Để trống thì form vẫn hoạt động
      bình thường (hiện lời cảm ơn) nhưng không lưu đi đâu — giống bản demo cũ.
   --------------------------------------------------- */
-  const RSVP_ENDPOINT = ""; // vd: "https://script.google.com/macros/s/XXXXXXXX/exec"
+  const RSVP_ENDPOINT = "https://script.google.com/macros/s/AKfycbwjM-juaFIwhH6K5QJdp0BuQRPtYWNM8IoxbOEqsZtJtUPjMujW2icTqXPS4gc1hgwk/exec";
 
   /* ---------- 8b. RSVP form ---------- */
   // "Bạn là khách mời của" — bấm để chọn Chú Rể / Cô Dâu, lưu vào ô ẩn #rsvpSide
