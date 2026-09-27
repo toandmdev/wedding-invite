@@ -162,17 +162,22 @@ a { color: inherit; text-decoration: none; }
   visibility: hidden;
   pointer-events: none;
 }
-/* .envelope không còn ép chiều cao cố định (aspect-ratio) — để chiều cao tự co giãn
-   theo nội dung thẻ tên khách bên dưới. Khi tên khách dài phải xuống 2-3 dòng, thẻ
-   trắng (.envelope-card) sẽ tự nới rộng xuống dưới, kéo cả phong bì cao thêm theo,
-   thay vì đẩy chữ "TRÂN TRỌNG KÍNH MỜI" trồi lên đè vào phần nắp phong bì như trước. */
+/* .envelope-card giờ nằm LỒNG BÊN TRONG .envelope-body (thay vì đặt tách rời bên
+   ngoài với margin âm) — .envelope-body dùng flexbox để canh thẻ tên khách vào
+   đúng giữa phần thân phong bì, padding-top đủ chừa chỗ cho nắp + dấu niêm phong.
+   Không còn aspect-ratio cố định nữa nên khi tên khách dài, cả khối tự cao thêm
+   theo nội dung thay vì bị đẩy lệch/hở khoảng trống như trước. */
 .envelope {
   position: relative;
   width: min(300px, 78vw);
 }
 .envelope-body {
   position: relative;
-  aspect-ratio: 3 / 2;
+  min-height: 200px;
+  padding: 108px 8% 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: linear-gradient(180deg, var(--color-white), var(--color-bg-alt));
   border: 1px solid var(--color-line);
   border-radius: var(--radius-sm);
@@ -190,7 +195,7 @@ a { color: inherit; text-decoration: none; }
 }
 .envelope-seal {
   position: absolute;
-  top: 40%;
+  top: 78px;
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 1.8rem;
@@ -198,7 +203,7 @@ a { color: inherit; text-decoration: none; }
 }
 .envelope-card {
   position: relative;
-  margin: -14px 8% 0;
+  width: 100%;
   background: var(--color-white);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-sm);

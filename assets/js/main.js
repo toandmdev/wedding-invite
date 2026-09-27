@@ -522,18 +522,33 @@
      Dùng thư viện âm lịch Việt Nam (assets/js/vendor/vn-lunar.min.js,
      dựa trên thuật toán Hồ Ngọc Đức) để tự tính, không cần nhập tay.
   --------------------------------------------------- */
+  function lunarTextFor(dateObj) {
+    const lunar = new window.VNLunar.LunarDate(new Date(dateObj));
+    const leapText = lunar.isLeap ? " (nhuận)" : "";
+    return `Tức ngày ${lunar.date} tháng ${lunar.month}${leapText} năm ${lunar.lunarYear.can} ${lunar.lunarYear.chi} (Âm lịch)`;
+  }
+  // Trích ngày dương lịch (dd/mm/yyyy) từ nội dung hiển thị của 1 khung sự kiện
+  // (vd "Vào lúc 11:00<br/>Thứ Bảy, 24/10/2026") để tính Âm lịch riêng cho đúng
+  // ngày của khung đó — Tiệc Chung Vui và buổi lễ có thể diễn ra khác ngày nhau
+  // (thường Tiệc tổ chức trước 1 ngày), nên KHÔNG được dùng chung 1 dòng Âm lịch
+  // tính từ WEDDING_DATE như trước (gây sai ngày Âm lịch cho Tiệc khi khác ngày).
+  function dateFromEventText(elId, fallback) {
+    const el = document.getElementById(elId);
+    const text = el ? el.textContent : "";
+    const m = text && text.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (!m) return fallback;
+    const [, d, mo, y] = m;
+    return new Date(Number(y), Number(mo) - 1, Number(d));
+  }
   function renderLunarDate() {
     if (!window.VNLunar || typeof window.VNLunar.LunarDate !== "function") return;
     try {
-      const lunar = new window.VNLunar.LunarDate(new Date(WEDDING_DATE));
-      const leapText = lunar.isLeap ? " (nhuận)" : "";
-      const long = `Tức ngày ${lunar.date} tháng ${lunar.month}${leapText} năm ${lunar.lunarYear.can} ${lunar.lunarYear.chi} (Âm lịch)`;
-      // Cả buổi lễ lẫn Tiệc Chung Vui hiện đều tính theo cùng một WEDDING_DATE,
-      // nên dùng chung một dòng Âm lịch cho cả hai khung sự kiện.
-      const tiecLunarEl = document.getElementById("eventTiecLunar");
+      const leDate = dateFromEventText("eventLeTime", WEDDING_DATE);
+      const tiecDate = dateFromEventText("eventTiecTime", WEDDING_DATE);
       const leLunarEl = document.getElementById("eventLeLunar");
-      if (tiecLunarEl) tiecLunarEl.textContent = long;
-      if (leLunarEl) leLunarEl.textContent = long;
+      const tiecLunarEl = document.getElementById("eventTiecLunar");
+      if (leLunarEl) leLunarEl.textContent = lunarTextFor(leDate);
+      if (tiecLunarEl) tiecLunarEl.textContent = lunarTextFor(tiecDate);
     } catch (err) {
       // Nếu thư viện lỗi vì lý do gì đó, chỉ ẩn dòng âm lịch đi, không ảnh hưởng phần còn lại của trang.
       document.querySelectorAll("#eventTiecLunar, #eventLeLunar").forEach((el) => { if (el) el.hidden = true; });
