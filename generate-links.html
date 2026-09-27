@@ -71,14 +71,20 @@
 
     <label for="benSelect" style="margin-top:20px;">Tạo thiệp cho bên nào?</label>
     <select id="benSelect">
-      <option value="gai">🌿 Nhà Gái — Tiệc Chung Vui + Lễ Vu Quy (8:00, 25/10/2026, cố định)</option>
+      <option value="gai">🌿 Nhà Gái — Tiệc Chung Vui + Lễ Vu Quy (08:00, 25/10/2026, cố định)</option>
       <option value="trai">🥂 Nhà Trai — Tiệc Chung Vui + Lễ Thành Hôn (10:00, 25/10/2026, cố định)</option>
     </select>
     <p class="note" style="margin-top:-4px;">Giờ &amp; địa chỉ buổi lễ + Tiệc Chung Vui (tư gia) đã gắn sẵn cố định trong trang theo từng bên, không cần nhập lại ở đây nữa.</p>
 
-    <label for="tiecNgayGio" style="margin-top:20px;">🥂 Tiệc Chung Vui — giờ &amp; ngày (đợt khách này)</label>
-    <input id="tiecNgayGio" type="datetime-local" value="2026-10-25T11:00" />
-    <p class="note" style="margin-top:-4px;">Giờ Tiệc Chung Vui có thể khác nhau theo từng đợt khách (khác bàn/khác ca) nên vẫn cần điền ở đây — điền 1 lần cho cả danh sách bên dưới, khách nào cùng giờ thì tạo chung 1 lần.</p>
+    <label for="tiecNgay" style="margin-top:20px;">🥂 Tiệc Chung Vui — ngày (đợt khách này)</label>
+    <input id="tiecNgay" type="date" value="2026-10-25" />
+    <label style="margin-top:14px;">🕐 Giờ mời tiệc (định dạng 24h — không phụ thuộc múi giờ/máy tính của bạn)</label>
+    <div style="display:flex; gap:8px; align-items:center; max-width:220px;">
+      <select id="tiecGioH" aria-label="Giờ"></select>
+      <span style="font-weight:700;">:</span>
+      <select id="tiecGioM" aria-label="Phút"></select>
+    </div>
+    <p class="note" style="margin-top:8px;">Giờ Tiệc Chung Vui có thể khác nhau theo từng đợt khách (khác bàn/khác ca) nên vẫn cần điền ở đây — điền 1 lần cho cả danh sách bên dưới, khách nào cùng giờ thì tạo chung 1 lần.</p>
 
     <label for="names" style="margin-top:20px;">Danh sách khách mời (mỗi tên một dòng)</label>
     <textarea id="names" placeholder="Nguyễn Văn A&#10;Trần Thị B&#10;Gia đình Cô Chú C">Nguyễn Văn A
@@ -121,13 +127,37 @@ Gia đình Cô Chú C</textarea>
 
   const benSelect = document.getElementById("benSelect");
 
+  // Giờ mời tiệc dùng 2 ô <select> số giờ (00-23) + số phút (00/05/.../55) thay
+  // vì input datetime-local — vì input datetime-local hiển thị theo định dạng
+  // giờ của hệ điều hành/trình duyệt (có máy hiện AM/PM), không đảm bảo luôn là
+  // 24h. Dùng <select> số thuần thì chắc chắn luôn là 24h trên mọi máy.
+  const tiecGioH = document.getElementById("tiecGioH");
+  const tiecGioM = document.getElementById("tiecGioM");
+  for (let h = 0; h < 24; h++) {
+    const opt = document.createElement("option");
+    opt.value = String(h).padStart(2, "0");
+    opt.textContent = String(h).padStart(2, "0");
+    tiecGioH.appendChild(opt);
+  }
+  for (let m = 0; m < 60; m += 5) {
+    const opt = document.createElement("option");
+    opt.value = String(m).padStart(2, "0");
+    opt.textContent = String(m).padStart(2, "0");
+    tiecGioM.appendChild(opt);
+  }
+  tiecGioH.value = "11";
+  tiecGioM.value = "00";
+
   // Chỉ còn "ben" + "tiec_gio" (giờ Tiệc Chung Vui của đợt khách này, có thể
   // khác nhau theo từng đợt) là cần truyền qua URL — giờ lễ, địa chỉ, tên buổi
   // lễ đều đã gắn sẵn cố định trong trang theo từng "ben" (xem main.js), nên
   // link sinh ra rất ngắn gọn và vẫn giữ nguyên tên miền của bạn.
   function eventParams() {
     const ben = benSelect.value; // "gai" hoặc "trai"
-    const tiecNgayGio = document.getElementById("tiecNgayGio").value;
+    const tiecNgay = document.getElementById("tiecNgay").value; // "YYYY-MM-DD"
+    const hh = tiecGioH.value;
+    const mm = tiecGioM.value;
+    const tiecNgayGio = tiecNgay ? `${tiecNgay}T${hh}:${mm}` : "";
 
     const timeOnly = (dt) => (dt ? dt.split("T")[1] : "");
     const tiecGio = tiecNgayGio

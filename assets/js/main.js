@@ -90,7 +90,7 @@
   // cố định nên gắn thẳng vào đây, khỏi phải lặp lại trong từng link khách mời.
   const EVENT_LE = {
     trai: { time: "Vào lúc 10:00<br/>Chủ nhật, 25/10/2026", isoDate: "2026-10-25T10:00:00+07:00" },
-    gai: { time: "Vào lúc 8:00<br/>Chủ nhật, 25/10/2026", isoDate: "2026-10-25T08:00:00+07:00" },
+    gai: { time: "Vào lúc 08:00<br/>Chủ nhật, 25/10/2026", isoDate: "2026-10-25T08:00:00+07:00" },
   };
 
   (function applyEventOverrides() {
