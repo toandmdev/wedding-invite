@@ -10,7 +10,8 @@
      https://ten-mien-cua-ban.vercel.app/?to=Nguyen%20Van%20A
      Cũng hỗ trợ ?name=... và ?khachmoi=MÃ (mã riêng theo dõi từng khách,
      không hiển thị, dùng để bạn biết link nào ứng với khách nào nếu cần).
-     Thêm dấu "+" ở cuối tên (vd: ?name=Toan+) sẽ hiển thị "và người thân".
+     Tên hiển thị đúng y như đã điền — kể cả khi có dấu "+" ở cuối (vd "A +"),
+     không tự ý đổi thành "và người thân" nữa.
      Xem generate-links.html để tạo hàng loạt link cho danh sách khách.
   --------------------------------------------------- */
   function getGuestName() {
@@ -18,12 +19,8 @@
     // URLSearchParams đã tự giải mã %20/+/%2B đúng chuẩn, không cần xử lý thêm.
     const raw = params.get("to") || params.get("name") || params.get("ten");
     if (!raw) return null;
-    let cleaned = raw.trim();
+    const cleaned = raw.trim();
     if (!cleaned.length) return null;
-
-    const plusOne = /\+\s*$/.test(cleaned);
-    if (plusOne) cleaned = cleaned.replace(/\+\s*$/, "").trim();
-    if (plusOne) cleaned = `${cleaned} và người thân`;
     return cleaned;
   }
 
