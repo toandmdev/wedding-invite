@@ -344,7 +344,7 @@
      lấy đoạn code + các bước deploy chi tiết). Để trống thì form vẫn hoạt động
      bình thường (hiện lời cảm ơn) nhưng không lưu đi đâu — giống bản demo cũ.
   --------------------------------------------------- */
-  const RSVP_ENDPOINT = "https://script.google.com/macros/s/AKfycbwjM-juaFIwhH6K5QJdp0BuQRPtYWNM8IoxbOEqsZtJtUPjMujW2icTqXPS4gc1hgwk/exec";
+  const RSVP_ENDPOINT = "https://script.google.com/macros/s/AKfycby7xH_Oq3IlptiKRDp8PAMCHVV9Fh6xTTeC6nMrsPeQaPmfcUTQmAGXHIVpRL8jyy0F/exec";
 
   /* ---------- 8b. RSVP form ---------- */
   // "Bạn là khách mời của" — bấm để chọn Chú Rể / Cô Dâu, lưu vào ô ẩn #rsvpSide
@@ -554,22 +554,74 @@
   renderLunarDate();
 
   /* ---------- 12. Sổ lưu bút (Guestbook) ----------
-     Sổ để trống lúc mới tải trang — chỉ hiện lời chúc thật khi khách tự nhập
-     và bấm "Gửi lời chúc" (không còn 2 lời chúc mẫu như bản demo trước đây).
-     Lưu ý: lời chúc hiện vẫn chỉ hiển thị tạm trong trình duyệt của đúng
-     người vừa gửi (mất khi họ tải lại trang) — chưa có backend nên các khách
-     khác không thấy lời chúc của nhau. Muốn mọi khách cùng thấy lời chúc thật
-     của nhau, cần nối vào Google Sheet tương tự cách làm với RSVP bên dưới.
+     Lời chúc được lưu thật vào Google Sheet (cùng 1 Apps Script với RSVP —
+     xem google-apps-script-rsvp.txt) và TẢI NGƯỢC LẠI từ Sheet để mọi khách
+     mở thiệp đều thấy lời chúc của nhau (không còn chỉ hiện tạm trong máy
+     người vừa gửi như bản demo cũ).
+     Dùng kỹ thuật JSONP (thẻ <script> động) để đọc dữ liệu từ Apps Script
+     thay vì fetch() thường, vì Apps Script Web App không trả header CORS
+     cho phép JS đọc trực tiếp response — JSONP không bị giới hạn này.
   --------------------------------------------------- */
-  function renderWishCard(wish) {
+  function renderWishCard(wish, mode) {
     const wall = document.getElementById("guestbookWall");
     if (!wall) return;
     const card = document.createElement("div");
     card.className = "wish-card in-view";
-    const safeName = wish.name.replace(/[<>]/g, "");
-    const safeMsg = wish.message.replace(/[<>]/g, "");
+    const safeName = String(wish.name || "").replace(/[<>]/g, "");
+    const safeMsg = String(wish.message || "").replace(/[<>]/g, "");
+    if (!safeMsg) return;
     card.innerHTML = `<p class="wish-msg">${safeMsg}</p><p class="wish-name">— ${safeName}</p>`;
-    wall.prepend(card);
+    if (mode === "append") wall.appendChild(card);
+    else wall.prepend(card);
+  }
+
+  // Tải danh sách lời chúc có sẵn trong Google Sheet lên đầu trang, qua JSONP.
+  function loadWishesFromSheet() {
+    if (!RSVP_ENDPOINT) return;
+    const callbackName = "__wishesCallback_" + Date.now();
+    const script = document.createElement("script");
+    let done = false;
+    const cleanup = () => {
+      done = true;
+      delete window[callbackName];
+      script.remove();
+    };
+    window[callbackName] = (data) => {
+      if (done) return;
+      const wishes = Array.isArray(data && data.wishes) ? data.wishes : [];
+      // Sheet lưu theo thứ tự cũ → mới; hiện mới nhất lên đầu nên duyệt ngược
+      // và luôn "prepend" (giống cách lời chúc mới gửi được chèn lên đầu).
+      wishes
+        .filter((w) => w && String(w.message || "").trim())
+        .forEach((w) => renderWishCard(w, "prepend"));
+      cleanup();
+    };
+    script.src = `${RSVP_ENDPOINT}?callback=${callbackName}&action=wishes`;
+    script.onerror = cleanup;
+    // Lỗi mạng/Apps Script chưa deploy lại bản có doGet cũng không chặn trải
+    // nghiệm khách — sổ lưu bút chỉ đơn giản hiện trống như trước.
+    setTimeout(cleanup, 8000);
+    document.body.appendChild(script);
+  }
+  loadWishesFromSheet();
+
+  function sendWishToSheet(name, message) {
+    if (!RSVP_ENDPOINT) return;
+    fetch(RSVP_ENDPOINT, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        name,
+        phone: "",
+        side: "",
+        attend: "",
+        guests: 0,
+        message,
+        khachmoi: guestCode || "",
+        nguon: "guestbook",
+      }),
+    }).catch(() => {});
   }
 
   const guestbookForm = document.getElementById("guestbookForm");
@@ -581,10 +633,9 @@
       const name = (nameEl.value || displayName).trim();
       const message = msgEl.value.trim();
       if (!message) return;
-      renderWishCard({ name, message });
+      renderWishCard({ name, message }, "prepend");
+      sendWishToSheet(name, message);
       msgEl.value = "";
-      // DEMO: chưa gửi đi đâu lưu trữ lâu dài. Khi có backend (Google Sheet/API),
-      // thêm 1 lệnh fetch(...) ở đây để lưu lời chúc thật (xem README.md).
     });
   }
 
