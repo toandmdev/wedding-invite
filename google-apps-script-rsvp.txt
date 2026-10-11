@@ -1,25 +1,40 @@
 ===========================================================================
-GOOGLE APPS SCRIPT — Nhận RSVP + Lời chúc, lưu vào Google Sheet, và trả
-lại danh sách lời chúc cho thiệp hiển thị (doGet, dùng JSONP).
+GOOGLE APPS SCRIPT — Nhận RSVP + Lời chúc, GỘP CHUNG 1 DÒNG/KHÁCH trong
+Google Sheet (không bị tách 2 dòng khi khách vừa gửi lời chúc vừa xác nhận
+tham dự), và trả lại danh sách lời chúc cho thiệp hiển thị (doGet, JSONP).
 ===========================================================================
 
-CÁCH DÙNG (nếu bạn ĐÃ có sẵn 1 Apps Script project đang chạy RSVP_ENDPOINT
-hiện tại trong main.js):
+CÁCH DÙNG (bạn đã có sẵn Apps Script project đang chạy RSVP_ENDPOINT hiện
+tại trong main.js, chỉ cần thay code):
 
 1. Mở lại Google Sheet mừng cưới → menu "Extensions" (Tiện ích mở rộng) →
    "Apps Script".
-2. XOÁ HẾT code cũ trong file Code.gs, dán toàn bộ đoạn code bên dưới vào.
+2. XOÁ HẾT code cũ trong file Code.gs, dán toàn bộ đoạn CODE.GS bên dưới
+   vào.
 3. Bấm biểu tượng 💾 Save.
 4. Bấm "Deploy" (Triển khai) → "Manage deployments" (Quản lý bản triển khai).
 5. Ở bản deployment đang dùng, bấm biểu tượng ✏️ (Edit) → ở ô "Version"
    chọn "New version" (Phiên bản mới) → bấm "Deploy".
-   ⚠️ QUAN TRỌNG: làm theo đúng bước này (Edit bản cũ → New version) để
-   giữ nguyên URL /exec hiện tại — main.js đang dùng sẵn URL đó, không cần
-   sửa gì thêm trong main.js. Nếu bạn bấm "New deployment" (tạo bản triển
-   khai hoàn toàn mới) thì sẽ ra URL khác, lúc đó phải cập nhật lại
-   RSVP_ENDPOINT trong main.js.
-6. Xong — mở lại thiệp (nhớ tải lại trang, Ctrl+F5 để xoá cache) để kiểm
-   tra phần "Gửi Lời Chúc" đã hiện các lời chúc có sẵn trong Sheet chưa.
+   ⚠️ QUAN TRỌNG: làm đúng bước này (Edit bản cũ → New version) để giữ
+   nguyên URL /exec hiện tại — không cần sửa gì trong main.js. Nếu bấm
+   "New deployment" (tạo bản triển khai MỚI hoàn toàn) sẽ ra URL khác,
+   lúc đó phải cập nhật lại RSVP_ENDPOINT trong main.js.
+6. Xong — thử gửi RSVP + lời chúc bằng 1 tên khách bất kỳ, kiểm tra trong
+   Sheet chỉ ra ĐÚNG 1 dòng duy nhất cho tên đó (không tách 2 dòng).
+
+⚠️ LƯU Ý QUAN TRỌNG VỀ DỮ LIỆU CŨ: cách gộp dòng mới này chỉ áp dụng cho
+các lượt gửi MỚI sau khi bạn deploy bản này. Các dòng ĐÃ bị tách 2 dòng từ
+trước (lúc chưa có bản sửa này) sẽ KHÔNG tự gộp lại — bạn cần tự gộp thủ
+công các dòng cũ đó trong Sheet (copy phần "Lời chúc" từ dòng guestbook
+sang dòng rsvp của cùng 1 khách, rồi xoá dòng thừa) nếu muốn dọn sạch.
+
+⚠️ LƯU Ý VỀ TRÙNG TÊN: script gộp dòng bằng cách so khớp đúng tên (không
+phân biệt hoa/thường) — nếu 2 khách khác nhau trót có CÙNG tên (vd 2 người
+đều tên "Nguyễn Văn A"), 2 lượt gửi của họ sẽ bị gộp NHẦM vào chung 1 dòng.
+Để tránh việc này hoàn toàn, dùng link cá nhân hoá có mang theo mã khách
+riêng (?khachmoi=...) khi tạo link ở generate-links.html — nếu không chắc
+có cần việc này hay không, cứ dùng bản hiện tại (so theo tên) là đủ cho
+hầu hết đám cưới vì tên trùng hoàn toàn khá hiếm.
 
 Nếu đây là lần đầu bạn tạo Apps Script, làm theo các bước ở mục "TẠO MỚI
 TỪ ĐẦU" ở cuối file này.
@@ -32,6 +47,8 @@ CODE.GS
 // Sheet bạn đang dùng để lưu RSVP. Nếu Sheet của bạn đặt tên cột khác,
 // sửa lại danh sách HEADERS bên dưới cho khớp.
 const HEADERS = ["Thời gian", "Tên", "SĐT", "Bên", "Tham dự", "Số khách", "Lời chúc", "Mã khách", "Nguồn"];
+// Vị trí cột (0 = cột A) — phải khớp đúng thứ tự HEADERS ở trên.
+const COL = { TIME: 0, NAME: 1, PHONE: 2, SIDE: 3, ATTEND: 4, GUESTS: 5, MESSAGE: 6, KHACHMOI: 7, NGUON: 8 };
 
 function getSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -44,22 +61,96 @@ function getSheet() {
   return sheet;
 }
 
-// Nhận RSVP / lời chúc mới, ghi vào cuối Sheet.
+// Giữ giá trị mới nếu khách có điền (khác rỗng/undefined); nếu không, giữ
+// lại giá trị cũ đã có trong Sheet — nhờ vậy gửi lời chúc sau không xoá
+// mất thông tin RSVP đã gửi trước đó, và ngược lại. Dùng cho cả số 0 (vd
+// "Số người đi cùng" = 0 vẫn được coi là đã điền, không bị coi là rỗng).
+function pick(newVal, oldVal) {
+  if (newVal === undefined || newVal === null) return oldVal;
+  if (typeof newVal === "string" && newVal.trim() === "") return oldVal;
+  return newVal;
+}
+
+// Gộp cột "Nguồn" (vd "rsvp" + "guestbook" -> "rsvp,guestbook") để biết
+// khách đã gửi qua những đường nào, không bắt buộc phải dùng tới.
+function mergeNguon(oldVal, addVal) {
+  const parts = String(oldVal || "").split(",").map((s) => s.trim()).filter(Boolean);
+  const add = String(addVal || "").trim();
+  if (add && parts.indexOf(add) === -1) parts.push(add);
+  return parts.join(",");
+}
+
+// Nhận RSVP / lời chúc mới — GỘP vào đúng 1 dòng cho mỗi khách thay vì
+// luôn thêm dòng mới: khớp theo "Mã khách" (khachmoi) nếu link thiệp của
+// khách có mang mã riêng, nếu không thì khớp theo "Tên" (không phân biệt
+// hoa/thường). Tìm thấy dòng khớp -> cập nhật đè lên dòng đó (merge, giữ
+// lại các ô khách chưa điền ở lượt gửi này). Không tìm thấy -> thêm dòng
+// mới như bình thường.
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
     const sheet = getSheet();
-    sheet.appendRow([
-      new Date(),
-      data.name || "",
-      data.phone || "",
-      data.side || "",
-      data.attend || "",
-      data.guests || "",
-      data.message || "",
-      data.khachmoi || "",
-      data.nguon || "rsvp",
-    ]);
+    const name = String(data.name || "").trim();
+    const khachmoi = String(data.khachmoi || "").trim();
+    const nguonMoi = data.nguon || "rsvp";
+
+    const lastRow = sheet.getLastRow();
+    let matchRowIndex = -1; // số dòng thật trong Sheet (1-indexed)
+    if (lastRow > 1) {
+      const values = sheet.getRange(2, 1, lastRow - 1, HEADERS.length).getValues();
+      // Ưu tiên khớp theo "Mã khách" (khachmoi) nếu lượt gửi này có mang mã —
+      // chắc chắn đúng khách hơn so tên.
+      if (khachmoi) {
+        for (let i = 0; i < values.length; i++) {
+          const rowKhach = String(values[i][COL.KHACHMOI] || "").trim();
+          if (rowKhach && rowKhach === khachmoi) {
+            matchRowIndex = i + 2; // +2: bù dòng tiêu đề + mảng 0-indexed
+            break;
+          }
+        }
+      }
+      // Không có mã khách, hoặc không tìm thấy dòng nào khớp mã -> thử khớp
+      // theo "Tên" (không phân biệt hoa/thường). Việc này gộp đúng cả trường
+      // hợp lượt gửi trước (vd RSVP) chưa mang mã khách.
+      if (matchRowIndex === -1 && name) {
+        for (let i = 0; i < values.length; i++) {
+          const rowName = String(values[i][COL.NAME] || "").trim();
+          if (rowName && rowName.toLowerCase() === name.toLowerCase()) {
+            matchRowIndex = i + 2;
+            break;
+          }
+        }
+      }
+    }
+
+    if (matchRowIndex > 0) {
+      const existing = sheet.getRange(matchRowIndex, 1, 1, HEADERS.length).getValues()[0];
+      const merged = [
+        new Date(),
+        pick(data.name, existing[COL.NAME]),
+        pick(data.phone, existing[COL.PHONE]),
+        pick(data.side, existing[COL.SIDE]),
+        pick(data.attend, existing[COL.ATTEND]),
+        pick(data.guests, existing[COL.GUESTS]),
+        pick(data.message, existing[COL.MESSAGE]),
+        pick(data.khachmoi, existing[COL.KHACHMOI]),
+        mergeNguon(existing[COL.NGUON], nguonMoi),
+      ];
+      sheet.getRange(matchRowIndex, 1, 1, HEADERS.length).setValues([merged]);
+    } else {
+      sheet.appendRow([
+        new Date(),
+        data.name || "",
+        data.phone || "",
+        data.side || "",
+        data.attend || "",
+        data.guests || "",
+        data.message || "",
+        data.khachmoi || "",
+        nguonMoi,
+      ]);
+    }
+
     return ContentService.createTextOutput(JSON.stringify({ ok: true }))
       .setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
@@ -78,8 +169,8 @@ function doGet(e) {
   const wishes = [];
   for (let i = 1; i < rows.length; i++) {
     const row = rows[i];
-    const name = String(row[1] || "").trim();
-    const message = String(row[6] || "").trim();
+    const name = String(row[COL.NAME] || "").trim();
+    const message = String(row[COL.MESSAGE] || "").trim();
     if (!message) continue;
     wishes.push({ name: name || "Khách mời", message: message });
   }
